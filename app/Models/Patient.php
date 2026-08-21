@@ -14,9 +14,13 @@ class Patient extends Model
         'phone',
         'date_of_birth',
         'gender',
+        'blood_group',
         'address',
         'emergency_contact_name',
         'emergency_contact_phone',
-        'blood_group',
+    ];
+
+    protected $casts = [
+        'date_of_birth' => 'date',
     ];
 }

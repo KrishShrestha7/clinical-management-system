@@ -8,18 +8,30 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
+    /**
+     * Register a new user.
+     */
     public function register(array $data): User
     {
-        $data['password'] = Hash::make($data['password']);
-
-        return User::create($data);
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role' => 'receptionist',
+        ]);
     }
 
+    /**
+     * Authenticate a user.
+     */
     public function login(array $credentials): bool
     {
         return Auth::attempt($credentials);
     }
 
+    /**
+     * Log out the authenticated user.
+     */
     public function logout(): void
     {
         Auth::logout();

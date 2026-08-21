@@ -7,7 +7,10 @@ use App\Http\Requests\UpdatePatientRequest;
 use App\Http\Resources\PatientResource;
 use App\Models\Patient;
 use App\Services\PatientService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class PatientController extends Controller
 {
@@ -16,34 +19,33 @@ class PatientController extends Controller
     ) {
         $this->authorizeResource(Patient::class, 'patient');
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        $patients = $this->patientService->paginate();
 
-        if ($request->expectsJson()) {
-            return PatientResource::collection($patients);
-        }
+    /**
+     * Display a listing of patients.
+     */
+    public function index(): View
+    {
+        $patients = Patient::latest()->paginate(10);
 
         return view('patients.index', compact('patients'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new patient.
      */
-    public function create()
+    public function create(): View
     {
         return view('patients.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created patient.
      */
-    public function store(StorePatientRequest $request)
+    public function store(StorePatientRequest $request): RedirectResponse|PatientResource
     {
-        $patient = $this->patientService->create($request->validated());
+        $patient = $this->patientService->create(
+            $request->validated()
+        );
 
         if ($request->expectsJson()) {
             return new PatientResource($patient);
@@ -55,10 +57,13 @@ class PatientController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified patient.
      */
-    public function show(Request $request, Patient $patient)
-    {
+    public function show(
+        Request $request,
+        Patient $patient
+    ): View|PatientResource {
+
         if ($request->expectsJson()) {
             return new PatientResource($patient);
         }
@@ -67,19 +72,25 @@ class PatientController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified patient.
      */
-    public function edit(Patient $patient)
+    public function edit(Patient $patient): View
     {
         return view('patients.edit', compact('patient'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified patient.
      */
-    public function update(UpdatePatientRequest $request, Patient $patient)
-    {
-        $patient = $this->patientService->update($patient, $request->validated());
+    public function update(
+        UpdatePatientRequest $request,
+        Patient $patient
+    ): RedirectResponse|PatientResource {
+
+        $patient = $this->patientService->update(
+            $patient,
+            $request->validated()
+        );
 
         if ($request->expectsJson()) {
             return new PatientResource($patient);
@@ -91,10 +102,13 @@ class PatientController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified patient.
      */
-    public function destroy(Request $request, Patient $patient)
-    {
+    public function destroy(
+        Request $request,
+        Patient $patient
+    ): RedirectResponse|JsonResponse {
+
         $this->patientService->delete($patient);
 
         if ($request->expectsJson()) {

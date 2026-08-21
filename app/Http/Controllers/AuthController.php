@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -55,7 +56,7 @@ class AuthController extends Controller
         );
     }
 
-    public function logout(): RedirectResponse
+    public function logout(Request $request): RedirectResponse
     {
         $this->authService->logout();
 

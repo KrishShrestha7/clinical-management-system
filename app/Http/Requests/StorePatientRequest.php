@@ -15,22 +15,62 @@ class StorePatientRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * Get the validation rules.
      */
     public function rules(): array
     {
         return [
-        'name' => ['required', 'string', 'max:255'],
-        'email' => ['nullable', 'email', 'unique:patients,email'],
-        'phone' => ['required', 'string', 'max:20'],
-        'date_of_birth' => ['required', 'date'],
-        'gender' => ['required', 'string', 'max:20'],
-        'address' => ['nullable', 'string'],
-        'emergency_contact_name' => ['nullable', 'string', 'max:255'],
-        'emergency_contact_phone' => ['nullable', 'string', 'max:20'],
-        'blood_group' => ['nullable', 'string', 'max:10'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                'unique:patients,email',
+            ],
+
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+            ],
+
+            'date_of_birth' => [
+                'required',
+                'date',
+            ],
+
+            'gender' => [
+                'required',
+                'in:Male,Female,Other',
+            ],
+
+            'blood_group' => [
+                'nullable',
+                'in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            ],
+
+            'address' => [
+                'required',
+                'string',
+                'max:500',
+            ],
+
+            'emergency_contact_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'emergency_contact_phone' => [
+                'required',
+                'string',
+                'max:20',
+            ],
         ];
     }
 }

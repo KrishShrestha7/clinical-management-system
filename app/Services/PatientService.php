@@ -6,25 +6,29 @@ use App\Models\Patient;
 
 class PatientService
 {
-    public function paginate(int $perPage = 10)
-    {
-        return Patient::latest()->paginate($perPage);
-    }
-
+    /**
+     * Create a new patient.
+     */
     public function create(array $data): Patient
     {
         return Patient::create($data);
     }
 
+    /**
+     * Update an existing patient.
+     */
     public function update(Patient $patient, array $data): Patient
     {
         $patient->update($data);
 
-        return $patient->refresh();
+        return $patient->fresh();
     }
 
-    public function delete(Patient $patient): void
+    /**
+     * Delete a patient.
+     */
+    public function delete(Patient $patient): bool
     {
-        $patient->delete();
+        return $patient->delete();
     }
 }
