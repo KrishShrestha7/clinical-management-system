@@ -11,12 +11,17 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use throwable;
 
 class PatientController extends Controller
 {
-    public function __construct(
-        private PatientService $patientService
-    ) {
+
+    protected PatientService $patientService;
+
+    public function __construct(PatientService $patientService)
+    {
+        $this->patientService = $patientService;
+
         $this->authorizeResource(Patient::class, 'patient');
     }
 
@@ -25,7 +30,7 @@ class PatientController extends Controller
      */
     public function index(): View
     {
-        $patients = Patient::latest()->paginate(10);
+        $patients = $this->patientService->getPaginated();
 
         return view('patients.index', compact('patients'));
     }
@@ -41,19 +46,34 @@ class PatientController extends Controller
     /**
      * Store a newly created patient.
      */
-    public function store(StorePatientRequest $request): RedirectResponse|PatientResource
-    {
-        $patient = $this->patientService->create(
-            $request->validated()
-        );
+    public function store(
+        StorePatientRequest $request
+    ): RedirectResponse|PatientResource|JsonResponse {
+        try {
+            $patient = $this->patientService->create(
+                $request->validated()
+            );
 
-        if ($request->expectsJson()) {
-            return new PatientResource($patient);
+            if ($request->expectsJson()) {
+                return new PatientResource($patient);
+            }
+
+            return redirect()
+                ->route('patients.show', $patient)
+                ->with('success', 'Patient created successfully.');
+        } catch (Throwable $exception) {
+            report($exception);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Patient could not be created.',
+                ], 500);
+            }
+
+            return back()
+                ->withInput()
+                ->with('error', 'Patient could not be created. Please try again.');
         }
-
-        return redirect()
-            ->route('patients.show', $patient)
-            ->with('success', 'Patient created successfully.');
     }
 
     /**
@@ -85,20 +105,33 @@ class PatientController extends Controller
     public function update(
         UpdatePatientRequest $request,
         Patient $patient
-    ): RedirectResponse|PatientResource {
+    ): RedirectResponse|PatientResource|JsonResponse {
+        try {
+            $patient = $this->patientService->update(
+                $patient,
+                $request->validated()
+            );
 
-        $patient = $this->patientService->update(
-            $patient,
-            $request->validated()
-        );
+            if ($request->expectsJson()) {
+                return new PatientResource($patient);
+            }
 
-        if ($request->expectsJson()) {
-            return new PatientResource($patient);
+            return redirect()
+                ->route('patients.show', $patient)
+                ->with('success', 'Patient updated successfully.');
+        } catch (Throwable $exception) {
+            report($exception);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Patient could not be updated.',
+                ], 500);
+            }
+
+            return back()
+                ->withInput()
+                ->with('error', 'Patient could not be updated. Please try again.');
         }
-
-        return redirect()
-            ->route('patients.show', $patient)
-            ->with('success', 'Patient updated successfully.');
     }
 
     /**
@@ -108,15 +141,27 @@ class PatientController extends Controller
         Request $request,
         Patient $patient
     ): RedirectResponse|JsonResponse {
+        try {
+            $this->patientService->delete($patient);
 
-        $this->patientService->delete($patient);
+            if ($request->expectsJson()) {
+                return response()->json(null, 204);
+            }
 
-        if ($request->expectsJson()) {
-            return response()->json(null, 204);
+            return redirect()
+                ->route('patients.index')
+                ->with('success', 'Patient deleted successfully.');
+        } catch (Throwable $exception) {
+            report($exception);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Patient could not be deleted.',
+                ], 500);
+            }
+
+            return back()
+                ->with('error', 'Patient could not be deleted. Please try again.');
         }
-
-        return redirect()
-            ->route('patients.index')
-            ->with('success', 'Patient deleted successfully.');
     }
 }

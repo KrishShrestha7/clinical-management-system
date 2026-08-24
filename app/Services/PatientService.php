@@ -3,9 +3,17 @@
 namespace App\Services;
 
 use App\Models\Patient;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PatientService
 {
+    /**
+     * Get paginated patients.
+     */
+    public function getPaginated(int $perPage = 10): LengthAwarePaginator
+    {
+        return Patient::latest()->paginate($perPage);
+    }
     /**
      * Create a new patient.
      */

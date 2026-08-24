@@ -29,7 +29,14 @@ class RegisterRequest extends FormRequest
                 'string',
                 'min:8',
                 'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/',//atleast one uppercase, lowercase, special, number
             ],
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'password.regex' => 'The password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
         ];
     }
 }
