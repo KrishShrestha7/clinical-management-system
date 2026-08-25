@@ -55,24 +55,32 @@ class User extends Authenticatable
     /**
  * Determine whether the user is an administrator.
  */
-public function isAdmin(): bool
-{
-    return $this->hasRole('admin');
-}
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
 
-/**
- * Determine whether the user is a doctor.
- */
-public function isDoctor(): bool
-{
-    return $this->hasRole('doctor');
-}
+    /**
+     * Determine whether the user is a doctor.
+     */
+    public function isDoctor(): bool
+    {
+        return $this->hasRole('doctor');
+    }
 
-/**
- * Determine whether the user is a receptionist.
- */
-public function isReceptionist(): bool
-{
-    return $this->hasRole('receptionist');
-}
+    /**
+     * Determine whether the user is a receptionist.
+     */
+    public function isReceptionist(): bool
+    {
+        return $this->hasRole('receptionist');
+    }
+
+    /**
+     * Determine whether the user is a patient.
+     */
+    public function isPatient(): bool
+    {
+        return $this->hasRole('patient');
+    }
 }

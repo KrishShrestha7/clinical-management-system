@@ -17,7 +17,7 @@ class AuthService
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => 'receptionist',
+            'role' => 'patient',
         ]);
             Auth::login($user);
 

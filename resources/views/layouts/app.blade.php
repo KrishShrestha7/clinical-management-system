@@ -40,12 +40,20 @@
 
             <div class="d-flex align-items-center gap-3">
 
-                <a
-                    href="{{ route('patients.index') }}"
-                    class="text-white text-decoration-none"
-                >
-                    Patients
-                </a>
+                @if (
+                    auth()->user()->isAdmin()
+                    || auth()->user()->isDoctor()
+                    || auth()->user()->isReceptionist()
+                )
+
+                    <a
+                        href="{{ route('patients.index') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        Patients
+                    </a>
+
+                @endif
 
                 <span class="text-white">
                     {{ auth()->user()->name }}
