@@ -37,6 +37,33 @@ class PatientPolicy
             || $user->isReceptionist();
     }
 
+        /**
+     * Determine whether the user can create their own patient profile.
+     */
+    public function createOwnProfile(User $user): bool
+    {
+        return $user->isPatient()
+            && $user->patient === null;
+    }
+
+        /**
+     * Determine whether the user can view their own patient profile.
+     */
+    public function viewOwnProfile(User $user): bool
+    {
+        return $user->isPatient()
+            && $user->patient !== null;
+    }
+
+    /**
+     * Determine whether the user can update their own patient profile.
+     */
+    public function updateOwnProfile(User $user): bool
+    {
+        return $user->isPatient()
+            && $user->patient !== null;
+    }
+
     /**
      * Determine whether the user can update the patient.
      */

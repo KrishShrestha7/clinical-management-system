@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Enums\UserRole;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -42,12 +44,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'role' => UserRole::class,
     ];
 
     /**
  * Determine whether the user has the given role.
  */
-    public function hasRole(string $role): bool
+    public function hasRole(UserRole $role): bool
     {
         return $this->role === $role;
     }
@@ -57,30 +60,29 @@ class User extends Authenticatable
  */
     public function isAdmin(): bool
     {
-        return $this->hasRole('admin');
+        return $this->hasRole(UserRole::ADMIN);
     }
 
-    /**
-     * Determine whether the user is a doctor.
-     */
     public function isDoctor(): bool
     {
-        return $this->hasRole('doctor');
+        return $this->hasRole(UserRole::DOCTOR);
     }
 
-    /**
-     * Determine whether the user is a receptionist.
-     */
     public function isReceptionist(): bool
     {
-        return $this->hasRole('receptionist');
+        return $this->hasRole(UserRole::RECEPTIONIST);
+    }
+
+    public function isPatient(): bool
+    {
+        return $this->hasRole(UserRole::PATIENT);
     }
 
     /**
-     * Determine whether the user is a patient.
-     */
-    public function isPatient(): bool
+ * Get the patient profile associated with the user.
+ */
+    public function patient(): HasOne
     {
-        return $this->hasRole('patient');
+        return $this->hasOne(Patient::class);
     }
 }

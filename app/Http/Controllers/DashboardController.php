@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\View\View;
-
+use App\Enums\UserRole;
 class DashboardController extends Controller
 {
     /**
@@ -14,10 +14,10 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         return match ($user->role) {
-            'admin' => view('dashboard.admin'),
-            'doctor' => view('dashboard.doctor'),
-            'receptionist' => view('dashboard.receptionist'),
-            'patient' => view('dashboard.patient'),
+            UserRole::ADMIN => view('dashboard.admin'),
+            UserRole::DOCTOR => view('dashboard.doctor'),
+            UserRole::RECEPTIONIST => view('dashboard.receptionist'),
+            UserRole::PATIENT => view('dashboard.patient'),
             default => abort(403, 'Unauthorized role.'),
         };
     }
