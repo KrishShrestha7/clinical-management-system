@@ -144,6 +144,84 @@
 
     </div>
 
+    <div class="card shadow-sm mt-4">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h5>
+                        Payment
+                    </h5>
+
+                    @if ($order->payments->isEmpty())
+
+                        <p class="text-muted mb-0">
+                            No payment has been initiated yet.
+                        </p>
+
+                    @else
+
+                        @php
+                            $latestPayment = $order->payments
+                                ->sortByDesc('id')
+                                ->first();
+                        @endphp
+
+                        <p class="mb-1">
+                            <strong>Status:</strong>
+                            {{ ucfirst($latestPayment->status->value) }}
+                        </p>
+
+                        <p class="mb-1">
+                            <strong>Reference:</strong>
+                            {{ $latestPayment->transaction_reference }}
+                        </p>
+
+                        <p class="mb-0">
+                            <strong>Amount:</strong>
+                            Rs. {{ number_format(
+                                (float) $latestPayment->amount,
+                                2
+                            ) }}
+                        </p>
+
+                    @endif
+
+                </div>
+
+                @if (
+                    $order->status === 'pending'
+                    && (
+                        $order->payments->isEmpty()
+                        || in_array(
+                            $order->payments
+                                ->sortByDesc('id')
+                                ->first()
+                                ->status
+                                ->value,
+                            ['failed', 'cancelled']
+                        )
+                    )
+                )
+
+                    <a
+                        href="{{ route('payments.create', $order) }}"
+                        class="btn btn-success"
+                    >
+                        Pay Now
+                    </a>
+
+                @endif
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 @endsection

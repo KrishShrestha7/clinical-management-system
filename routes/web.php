@@ -7,6 +7,7 @@ use App\Http\Controllers\PatientProfileController;
 use App\Http\Controllers\MedicineCatalogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -66,6 +67,16 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/my-orders/{order}', [OrderController::class, 'show'])
         ->name('orders.show');
+
+    Route::get(
+        '/my-orders/{order}/payment',
+        [PaymentController::class, 'create']
+    )->name('payments.create');
+
+    Route::post(
+        '/my-orders/{order}/payment',
+        [PaymentController::class, 'store']
+    )->name('payments.store');
 
     Route::resource('patients', PatientController::class);
 

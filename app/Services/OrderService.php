@@ -32,6 +32,7 @@ class OrderService
     {
         return $order->load([
             'items.medicine',
+            'payments',
         ]);
     }
     /**

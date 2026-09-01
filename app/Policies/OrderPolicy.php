@@ -25,4 +25,14 @@ class OrderPolicy
             && $user->patient !== null
             && $order->patient_id === $user->patient->id;
     }
+
+    /**
+     * Determine whether the user may initiate payment for the order.
+     */
+    public function pay(User $user, Order $order): bool
+    {
+        return $user->isPatient()
+            && $user->patient !== null
+            && $order->patient_id === $user->patient->id;
+    }
 }
