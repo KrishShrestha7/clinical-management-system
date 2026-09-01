@@ -19,4 +19,17 @@ class MedicineService
             ->latest()
             ->paginate($perPage);
     }
+
+    /**
+     * Get an available medicine by ID.
+     */
+    public function getAvailableMedicine(
+        Medicine $medicine
+    ): ?Medicine {
+        if (!$medicine->isAvailable()) {
+            return null;
+        }
+
+        return $medicine;
+    }
 }

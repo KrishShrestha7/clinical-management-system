@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Services\AuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
 use throwable;
 
 class AuthController extends Controller
@@ -27,9 +28,10 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): RedirectResponse
     {
         try {
-            $this->authService->register(
+            $user=$this->authService->register(
                 $request->validated()
             );
+            Auth::login($user);
 
             $request->session()->regenerate();
 

@@ -20,7 +20,6 @@ class AuthService
             'password' => Hash::make($data['password']),
             'role' => UserRole::PATIENT->value,
         ]);
-            Auth::login($user);
 
             return $user;
     }
@@ -31,6 +30,24 @@ class AuthService
     public function login(array $credentials): bool
     {
         return Auth::attempt($credentials);
+    }
+
+    /**
+     * Authenticate a user without creating a web session.
+     */
+    public function authenticate(array $credentials): ?User
+    {
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user) {
+            return null;
+        }
+
+        if (!Hash::check($credentials['password'], $user->password)) {
+            return null;
+        }
+
+        return $user;
     }
 
     /**
