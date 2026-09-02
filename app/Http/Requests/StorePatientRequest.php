@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\Gender;
+use Illuminate\Validation\Rule;
 
 class StorePatientRequest extends FormRequest
 {
@@ -46,7 +48,7 @@ class StorePatientRequest extends FormRequest
 
             'gender' => [
                 'required',
-                'in:Male,Female,Other',
+                Rule::enum(Gender::class),
             ],
 
             'blood_group' => [

@@ -10,11 +10,13 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
+
             <h2>Patients</h2>
 
             <p class="text-muted mb-0">
                 Manage registered patients
             </p>
+
         </div>
 
         <a
@@ -99,7 +101,7 @@
                                     </td>
 
                                     <td>
-                                        {{ $patient->gender }}
+                                        {{ $patient->gender?->value ?? 'N/A' }}
                                     </td>
 
                                     <td>
@@ -127,26 +129,29 @@
                                                 </a>
 
                                             @endcan
+
                                             @can('delete', $patient)
-                                            <form
-                                                method="POST"
-                                                action="{{ route('patients.destroy', $patient) }}"
-                                                onsubmit="return confirm('Are you sure you want to delete this patient?')"
-                                            >
 
-                                                @csrf
-
-                                                @method('DELETE')
-
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-sm btn-danger"
+                                                <form
+                                                    method="POST"
+                                                    action="{{ route('patients.destroy', $patient) }}"
+                                                    onsubmit="return confirm('Are you sure you want to delete this patient?')"
                                                 >
-                                                    Delete
-                                                </button>
 
-                                            </form>
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-sm btn-danger"
+                                                    >
+                                                        Delete
+                                                    </button>
+
+                                                </form>
+
                                             @endcan
+
                                         </div>
 
                                     </td>

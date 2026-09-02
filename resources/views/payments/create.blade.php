@@ -70,23 +70,19 @@
             >
 
                 @csrf
-
-                <input
-                    type="hidden"
-                    name="payment_method"
-                    value="online"
-                >
-
                 <div class="alert alert-info">
-                    Online payment will be processed through the
-                    configured payment provider.
+                    This project currently uses a demo payment method
+                    for testing the payment workflow.
                 </div>
 
                 <button
                     type="submit"
                     class="btn btn-success"
                 >
-                    Start Online Payment
+                    Pay Rs. {{ number_format(
+                        (float) $order->total_amount,
+                        2
+                    ) }}
                 </button>
 
             </form>

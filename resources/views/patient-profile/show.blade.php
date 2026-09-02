@@ -9,6 +9,7 @@
     <div class="row justify-content-center">
 
         <div class="col-md-8">
+
             @if (session('success'))
 
                 <div class="alert alert-success">
@@ -29,23 +30,23 @@
 
                 <h2>My Patient Profile</h2>
 
-                    <div class="d-flex gap-2">
+                <div class="d-flex gap-2">
 
-                        <a
-                            href="{{ route('patient-profile.edit') }}"
-                            class="btn btn-primary"
-                        >
-                            Edit Profile
-                        </a>
+                    <a
+                        href="{{ route('patient-profile.edit') }}"
+                        class="btn btn-primary"
+                    >
+                        Edit Profile
+                    </a>
 
-                        <a
-                            href="{{ route('dashboard') }}"
-                            class="btn btn-secondary"
-                        >
-                            Back to Dashboard
-                        </a>
+                    <a
+                        href="{{ route('dashboard') }}"
+                        class="btn btn-secondary"
+                    >
+                        Back to Dashboard
+                    </a>
 
-                    </div>
+                </div>
 
             </div>
 
@@ -60,13 +61,23 @@
                     <div class="row mb-3">
 
                         <div class="col-md-6">
+
                             <strong>Name:</strong>
-                            <p>{{ $patient->name }}</p>
+
+                            <p>
+                                {{ $patient->name }}
+                            </p>
+
                         </div>
 
                         <div class="col-md-6">
+
                             <strong>Email:</strong>
-                            <p>{{ $patient->email }}</p>
+
+                            <p>
+                                {{ $patient->email }}
+                            </p>
+
                         </div>
 
                     </div>
@@ -74,13 +85,23 @@
                     <div class="row mb-3">
 
                         <div class="col-md-6">
+
                             <strong>Phone:</strong>
-                            <p>{{ $patient->phone }}</p>
+
+                            <p>
+                                {{ $patient->phone }}
+                            </p>
+
                         </div>
 
                         <div class="col-md-6">
+
                             <strong>Date of Birth:</strong>
-                            <p>{{ $patient->date_of_birth->format('Y-m-d') }}</p>
+
+                            <p>
+                                {{ $patient->date_of_birth?->format('Y-m-d') ?? 'Not provided' }}
+                            </p>
+
                         </div>
 
                     </div>
@@ -88,13 +109,23 @@
                     <div class="row mb-3">
 
                         <div class="col-md-6">
+
                             <strong>Gender:</strong>
-                            <p>{{ $patient->gender }}</p>
+
+                            <p>
+                                {{ $patient->gender?->value ?? 'Not provided' }}
+                            </p>
+
                         </div>
 
                         <div class="col-md-6">
+
                             <strong>Blood Group:</strong>
-                            <p>{{ $patient->blood_group ?? 'Not provided' }}</p>
+
+                            <p>
+                                {{ $patient->blood_group ?? 'Not provided' }}
+                            </p>
+
                         </div>
 
                     </div>
@@ -105,7 +136,9 @@
                         Address
                     </h5>
 
-                    <p>{{ $patient->address }}</p>
+                    <p>
+                        {{ $patient->address ?? 'Not provided' }}
+                    </p>
 
                     <hr>
 
@@ -116,13 +149,23 @@
                     <div class="row">
 
                         <div class="col-md-6">
+
                             <strong>Contact Name:</strong>
-                            <p>{{ $patient->emergency_contact_name }}</p>
+
+                            <p>
+                                {{ $patient->emergency_contact_name ?? 'Not provided' }}
+                            </p>
+
                         </div>
 
                         <div class="col-md-6">
+
                             <strong>Contact Phone:</strong>
-                            <p>{{ $patient->emergency_contact_phone }}</p>
+
+                            <p>
+                                {{ $patient->emergency_contact_phone ?? 'Not provided' }}
+                            </p>
+
                         </div>
 
                     </div>

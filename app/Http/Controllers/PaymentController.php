@@ -40,19 +40,18 @@ class PaymentController extends Controller
         $this->authorize('pay', $order);
 
         try {
-            $payment = $this->paymentService
-                ->createPaymentAttempt(
-                    $request->user()->patient,
-                    $order,
-                    $request->validated('payment_method')
-                );
+                $payment = $this->paymentService
+                    ->processSimplePayment(
+                        $request->user()->patient,
+                        $order
+                    );
 
-            return redirect()
-                ->route('orders.show', $order)
-                ->with(
-                    'success',
-                    "Payment {$payment->transaction_reference} was initiated successfully."
-                );
+                return redirect()
+                    ->route('orders.show', $order)
+                    ->with(
+                        'success',
+                        "Payment {$payment->transaction_reference} completed successfully."
+                    );
         } catch (DomainException $exception) {
             return back()
                 ->with('error', $exception->getMessage());

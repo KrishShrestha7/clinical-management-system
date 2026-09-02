@@ -19,12 +19,16 @@
 
         <div class="d-flex gap-2">
 
-            <a
-                href="{{ route('patients.edit', $patient) }}"
-                class="btn btn-warning"
-            >
-                Edit Patient
-            </a>
+            @can('update', $patient)
+
+                <a
+                    href="{{ route('patients.edit', $patient) }}"
+                    class="btn btn-warning"
+                >
+                    Edit Patient
+                </a>
+
+            @endcan
 
             <a
                 href="{{ route('patients.index') }}"
@@ -41,9 +45,7 @@
     @if (session('success'))
 
         <div class="alert alert-success">
-
             {{ session('success') }}
-
         </div>
 
     @endif
@@ -78,7 +80,7 @@
                     <strong>Email</strong>
 
                     <p class="mb-0">
-                        {{ $patient->email }}
+                        {{ $patient->email ?? 'Not provided' }}
                     </p>
 
                 </div>
@@ -98,13 +100,7 @@
                     <strong>Date of Birth</strong>
 
                     <p class="mb-0">
-
-                        @if ($patient->date_of_birth)
-                            {{ $patient->date_of_birth->format('F d, Y') }}
-                        @else
-                            Not provided
-                        @endif
-
+                        {{ $patient->date_of_birth?->format('F d, Y') ?? 'Not provided' }}
                     </p>
 
                 </div>
@@ -114,7 +110,7 @@
                     <strong>Gender</strong>
 
                     <p class="mb-0">
-                        {{ $patient->gender }}
+                        {{ $patient->gender?->value ?? 'Not provided' }}
                     </p>
 
                 </div>
@@ -149,7 +145,7 @@
         <div class="card-body">
 
             <p class="mb-0">
-                {{ $patient->address }}
+                {{ $patient->address ?? 'Not provided' }}
             </p>
 
         </div>
@@ -176,7 +172,7 @@
                     <strong>Contact Name</strong>
 
                     <p class="mb-0">
-                        {{ $patient->emergency_contact_name }}
+                        {{ $patient->emergency_contact_name ?? 'Not provided' }}
                     </p>
 
                 </div>
@@ -186,7 +182,7 @@
                     <strong>Contact Phone</strong>
 
                     <p class="mb-0">
-                        {{ $patient->emergency_contact_phone }}
+                        {{ $patient->emergency_contact_phone ?? 'Not provided' }}
                     </p>
 
                 </div>
@@ -209,24 +205,27 @@
                     {{ $patient->created_at->format('F d, Y h:i A') }}
                 </span>
 
-                <form
-                    action="{{ route('patients.destroy', $patient) }}"
-                    method="POST"
-                    onsubmit="return confirm('Are you sure you want to delete this patient?')"
-                >
+                @can('delete', $patient)
 
-                    @csrf
-
-                    @method('DELETE')
-
-                    <button
-                        type="submit"
-                        class="btn btn-danger"
+                    <form
+                        action="{{ route('patients.destroy', $patient) }}"
+                        method="POST"
+                        onsubmit="return confirm('Are you sure you want to delete this patient?')"
                     >
-                        Delete Patient
-                    </button>
 
-                </form>
+                        @csrf
+                        @method('DELETE')
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger"
+                        >
+                            Delete Patient
+                        </button>
+
+                    </form>
+
+                @endcan
 
             </div>
 

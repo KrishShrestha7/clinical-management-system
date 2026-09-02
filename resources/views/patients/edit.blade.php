@@ -68,11 +68,9 @@
                     >
 
                         @csrf
-
                         @method('PUT')
 
                         {{-- Basic Information --}}
-
                         <h5 class="mb-3">
                             Basic Information
                         </h5>
@@ -184,7 +182,7 @@
                                     type="date"
                                     id="date_of_birth"
                                     name="date_of_birth"
-                                    value="{{ old('date_of_birth', optional($patient->date_of_birth)->format('Y-m-d')) }}"
+                                    value="{{ old('date_of_birth', $patient->date_of_birth?->format('Y-m-d')) }}"
                                     class="form-control @error('date_of_birth') is-invalid @enderror"
                                     required
                                 >
@@ -224,26 +222,16 @@
                                         Select Gender
                                     </option>
 
-                                    <option
-                                        value="Male"
-                                        {{ old('gender', $patient->gender) === 'Male' ? 'selected' : '' }}
-                                    >
-                                        Male
-                                    </option>
+                                    @foreach (\App\Enums\Gender::cases() as $gender)
 
-                                    <option
-                                        value="Female"
-                                        {{ old('gender', $patient->gender) === 'Female' ? 'selected' : '' }}
-                                    >
-                                        Female
-                                    </option>
+                                        <option
+                                            value="{{ $gender->value }}"
+                                            {{ old('gender', $patient->gender?->value) === $gender->value ? 'selected' : '' }}
+                                        >
+                                            {{ $gender->value }}
+                                        </option>
 
-                                    <option
-                                        value="Other"
-                                        {{ old('gender', $patient->gender) === 'Other' ? 'selected' : '' }}
-                                    >
-                                        Other
-                                    </option>
+                                    @endforeach
 
                                 </select>
 
@@ -312,7 +300,6 @@
                         </div>
 
                         {{-- Address --}}
-
                         <h5 class="mb-3 mt-3">
                             Address
                         </h5>
@@ -345,7 +332,6 @@
                         </div>
 
                         {{-- Emergency Contact --}}
-
                         <h5 class="mb-3 mt-4">
                             Emergency Contact
                         </h5>
@@ -413,7 +399,6 @@
                         </div>
 
                         {{-- Form Actions --}}
-
                         <hr class="my-4">
 
                         <div class="d-flex justify-content-end gap-2">

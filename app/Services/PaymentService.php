@@ -98,4 +98,67 @@ class PaymentService
             (string) Str::ulid()
         );
     }
+
+    /**
+     * Process a simple demo payment for an order.
+     */
+    public function processSimplePayment(
+        Patient $patient,
+        Order $order
+    ): Payment {
+        return DB::transaction(function () use ($patient, $order) {
+
+            $lockedOrder = Order::query()
+                ->whereKey($order->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedOrder->patient_id !== $patient->id) {
+                throw new DomainException(
+                    'You are not authorized to pay for this order.'
+                );
+            }
+
+            if ($lockedOrder->status !== 'pending') {
+                throw new DomainException(
+                    'This order is not available for payment.'
+                );
+            }
+
+            $alreadyPaid = $lockedOrder->payments()
+                ->where(
+                    'status',
+                    PaymentStatus::SUCCESSFUL->value
+                )
+                ->exists();
+
+            if ($alreadyPaid) {
+                throw new DomainException(
+                    'This order has already been paid.'
+                );
+            }
+
+            if ((float) $lockedOrder->total_amount <= 0) {
+                throw new DomainException(
+                    'The order amount must be greater than zero.'
+                );
+            }
+
+            $payment = $lockedOrder->payments()->create([
+                'payment_method' => 'demo',
+                'amount' => $lockedOrder->total_amount,
+                'status' => PaymentStatus::SUCCESSFUL->value,
+                'transaction_reference' =>
+                    $this->generateTransactionReference(),
+                'provider' => null,
+                'paid_at' => now(),
+            ]);
+
+            $lockedOrder->update([
+                'status' => 'paid',
+            ]);
+
+            return $payment;
+        });
+    }
 }

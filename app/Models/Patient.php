@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Enums\Gender;
 class Patient extends Model
 {
     use HasFactory;
@@ -25,6 +26,7 @@ class Patient extends Model
 
     protected $casts = [
         'date_of_birth' => 'date',
+        'gender' => Gender::class,
     ];
 
         /**

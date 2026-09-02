@@ -204,26 +204,16 @@
                                         Select Gender
                                     </option>
 
-                                    <option
-                                        value="Male"
-                                        {{ old('gender') === 'Male' ? 'selected' : '' }}
-                                    >
-                                        Male
-                                    </option>
+                                    @foreach (\App\Enums\Gender::cases() as $gender)
 
-                                    <option
-                                        value="Female"
-                                        {{ old('gender') === 'Female' ? 'selected' : '' }}
-                                    >
-                                        Female
-                                    </option>
+                                        <option
+                                            value="{{ $gender->value }}"
+                                            {{ old('gender') === $gender->value ? 'selected' : '' }}
+                                        >
+                                            {{ $gender->value }}
+                                        </option>
 
-                                    <option
-                                        value="Other"
-                                        {{ old('gender') === 'Other' ? 'selected' : '' }}
-                                    >
-                                        Other
-                                    </option>
+                                    @endforeach
 
                                 </select>
 

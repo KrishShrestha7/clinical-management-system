@@ -14,12 +14,6 @@ class InitiatePaymentRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'payment_method' => [
-                'required',
-                'string',
-                'in:online',
-            ],
-        ];
+        return [];
     }
 }

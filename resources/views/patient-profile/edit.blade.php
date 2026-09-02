@@ -43,7 +43,9 @@
 
                         @foreach ($errors->all() as $error)
 
-                            <li>{{ $error }}</li>
+                            <li>
+                                {{ $error }}
+                            </li>
 
                         @endforeach
 
@@ -124,9 +126,11 @@
                                 >
 
                                 @error('phone')
+
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
+
                                 @enderror
 
                             </div>
@@ -144,15 +148,17 @@
                                     type="date"
                                     id="date_of_birth"
                                     name="date_of_birth"
-                                    value="{{ old('date_of_birth', $patient->date_of_birth->format('Y-m-d')) }}"
+                                    value="{{ old('date_of_birth', $patient->date_of_birth?->format('Y-m-d')) }}"
                                     class="form-control @error('date_of_birth') is-invalid @enderror"
                                     required
                                 >
 
                                 @error('date_of_birth')
+
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
+
                                 @enderror
 
                             </div>
@@ -177,13 +183,17 @@
                                     required
                                 >
 
-                                    @foreach (['Male', 'Female', 'Other'] as $gender)
+                                    <option value="">
+                                        Select Gender
+                                    </option>
+
+                                    @foreach (\App\Enums\Gender::cases() as $gender)
 
                                         <option
-                                            value="{{ $gender }}"
-                                            {{ old('gender', $patient->gender) === $gender ? 'selected' : '' }}
+                                            value="{{ $gender->value }}"
+                                            {{ old('gender', $patient->gender?->value) === $gender->value ? 'selected' : '' }}
                                         >
-                                            {{ $gender }}
+                                            {{ $gender->value }}
                                         </option>
 
                                     @endforeach
@@ -191,9 +201,11 @@
                                 </select>
 
                                 @error('gender')
+
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
+
                                 @enderror
 
                             </div>
@@ -240,9 +252,11 @@
                                 </select>
 
                                 @error('blood_group')
+
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
+
                                 @enderror
 
                             </div>
@@ -267,9 +281,11 @@
                             >{{ old('address', $patient->address) }}</textarea>
 
                             @error('address')
+
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
+
                             @enderror
 
                         </div>
@@ -299,9 +315,11 @@
                                 >
 
                                 @error('emergency_contact_name')
+
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
+
                                 @enderror
 
                             </div>
@@ -325,9 +343,11 @@
                                 >
 
                                 @error('emergency_contact_phone')
+
                                     <div class="invalid-feedback">
                                         {{ $message }}
                                     </div>
+
                                 @enderror
 
                             </div>
@@ -367,3 +387,4 @@
 </div>
 
 @endsection
+```
