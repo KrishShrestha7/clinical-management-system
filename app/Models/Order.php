@@ -15,10 +15,16 @@ class Order extends Model
         'patient_id',
         'order_number',
         'status',
+        'subtotal_amount',
+        'vat_rate',
+        'vat_amount',
         'total_amount',
     ];
 
     protected $casts = [
+        'subtotal_amount' => 'decimal:2',
+        'vat_rate' => 'decimal:2',
+        'vat_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
     ];
 

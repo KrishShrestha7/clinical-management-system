@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class OrderController extends Controller
 {
@@ -43,5 +44,40 @@ class OrderController extends Controller
         );
 
         return view('orders.show', compact('order'));
+    }
+
+    /**
+     * Display the billing receipt for a paid order.
+     */
+    public function receipt(
+        Order $order
+    ): View|RedirectResponse {
+        $this->authorize('view', $order);
+
+        $order = $this->orderService
+            ->getOrderDetails($order);
+
+        $successfulPayment = $order->payments
+            ->firstWhere(
+                'status',
+                \App\Enums\PaymentStatus::SUCCESSFUL
+            );
+
+        if (
+            $order->status !== 'paid'
+            || !$successfulPayment
+        ) {
+            return redirect()
+                ->route('orders.show', $order)
+                ->with(
+                    'error',
+                    'A receipt is available only after successful payment.'
+                );
+        }
+
+        return view(
+            'orders.receipt',
+            compact('order', 'successfulPayment')
+        );
     }
 }

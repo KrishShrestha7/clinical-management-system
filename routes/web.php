@@ -78,6 +78,11 @@ Route::middleware('auth')->group(function () {
         [PaymentController::class, 'store']
     )->name('payments.store');
 
+    Route::get(
+        '/my-orders/{order}/receipt',
+        [OrderController::class, 'receipt']
+    )->name('orders.receipt');
+
     Route::resource('patients', PatientController::class);
 
     Route::post('/logout', [AuthController::class, 'logout'])

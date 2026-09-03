@@ -9,11 +9,13 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
+
             <h2>My Orders</h2>
 
             <p class="text-muted mb-0">
                 View your medicine order history.
             </p>
+
         </div>
 
         <a
@@ -25,6 +27,7 @@
 
     </div>
 
+
     @if (session('success'))
 
         <div class="alert alert-success">
@@ -32,6 +35,16 @@
         </div>
 
     @endif
+
+
+    @if (session('error'))
+
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+
+    @endif
+
 
     @if ($orders->isEmpty())
 
@@ -54,9 +67,10 @@
                             <tr>
                                 <th>Order Number</th>
                                 <th>Date</th>
+                                <th>Medicines</th>
                                 <th>Status</th>
-                                <th>Total</th>
-                                <th>Action</th>
+                                <th>Grand Total</th>
+                                <th>Actions</th>
                             </tr>
 
                         </thead>
@@ -71,28 +85,82 @@
                                         {{ $order->order_number }}
                                     </td>
 
+
                                     <td>
                                         {{ $order->created_at->format('Y-m-d H:i') }}
                                     </td>
 
+
                                     <td>
-                                        <span class="badge bg-warning text-dark">
-                                            {{ ucfirst($order->status) }}
-                                        </span>
+
+                                        {{ $order->items_count }}
+
+                                        {{ $order->items_count === 1
+                                            ? 'Medicine'
+                                            : 'Medicines' }}
+
                                     </td>
 
+
                                     <td>
-                                        Rs. {{ number_format((float) $order->total_amount, 2) }}
+
+                                        @if ($order->status === 'paid')
+
+                                            <span class="badge bg-success">
+                                                Paid
+                                            </span>
+
+                                        @elseif ($order->status === 'pending')
+
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
+
+                                        @else
+
+                                            <span class="badge bg-secondary">
+                                                {{ ucfirst($order->status) }}
+                                            </span>
+
+                                        @endif
+
                                     </td>
 
+
                                     <td>
 
-                                        <a
-                                            href="{{ route('orders.show', $order) }}"
-                                            class="btn btn-primary btn-sm"
-                                        >
-                                            View
-                                        </a>
+                                        Rs. {{ number_format(
+                                            (float) $order->total_amount,
+                                            2
+                                        ) }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <div class="d-flex gap-2">
+
+                                            <a
+                                                href="{{ route('orders.show', $order) }}"
+                                                class="btn btn-primary btn-sm"
+                                            >
+                                                View Order
+                                            </a>
+
+
+                                            @if ($order->status === 'paid')
+
+                                                <a
+                                                    href="{{ route('orders.receipt', $order) }}"
+                                                    class="btn btn-outline-success btn-sm"
+                                                >
+                                                    Receipt
+                                                </a>
+
+                                            @endif
+
+                                        </div>
 
                                     </td>
 
@@ -109,6 +177,7 @@
             </div>
 
         </div>
+
 
         <div class="mt-3">
 

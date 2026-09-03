@@ -21,6 +21,7 @@ class OrderService
         int $perPage = 10
     ): LengthAwarePaginator {
         return $patient->orders()
+            ->withCount('items')
             ->latest()
             ->paginate($perPage);
     }
@@ -53,10 +54,13 @@ class OrderService
             $order = $patient->orders()->create([
                 'order_number' => $this->generateOrderNumber(),
                 'status' => 'pending',
+                'subtotal_amount' => 0,
+                'vat_rate' => 0,
+                'vat_amount' => 0,
                 'total_amount' => 0,
             ]);
 
-            $totalAmount = 0;
+            $subtotalAmount = 0;
 
             foreach ($cartItems as $item) {
 
@@ -111,11 +115,34 @@ class OrderService
                     $quantity
                 );
 
-                $totalAmount += $lineTotal;
+                $subtotalAmount += $lineTotal;
             }
 
+            $subtotalAmount = round(
+                $subtotalAmount,
+                2
+            );
+
+            $vatRate = (float) config(
+                'billing.vat_rate',
+                13
+            );
+
+            $vatAmount = round(
+                $subtotalAmount * ($vatRate / 100),
+                2
+            );
+
+            $totalAmount = round(
+                $subtotalAmount + $vatAmount,
+                2
+            );
+
             $order->update([
-                'total_amount' => round($totalAmount, 2),
+                'subtotal_amount' => $subtotalAmount,
+                'vat_rate' => $vatRate,
+                'vat_amount' => $vatAmount,
+                'total_amount' => $totalAmount,
             ]);
 
             return $order->fresh([

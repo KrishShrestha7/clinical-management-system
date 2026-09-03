@@ -6,14 +6,24 @@
 
 <div class="container mt-4">
 
+    @php
+        $latestPayment = $order->payments
+            ->sortByDesc('id')
+            ->first();
+    @endphp
+
+
+    {{-- Page Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
 
         <div>
+
             <h2>Order Details</h2>
 
             <p class="text-muted mb-0">
                 {{ $order->order_number }}
             </p>
+
         </div>
 
         <a
@@ -25,6 +35,8 @@
 
     </div>
 
+
+    {{-- Success Message --}}
     @if (session('success'))
 
         <div class="alert alert-success">
@@ -33,6 +45,8 @@
 
     @endif
 
+
+    {{-- Error Message --}}
     @if (session('error'))
 
         <div class="alert alert-danger">
@@ -41,31 +55,78 @@
 
     @endif
 
+
+    {{-- Order Information --}}
     <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+                Order Information
+            </h5>
+
+        </div>
 
         <div class="card-body">
 
             <div class="row">
 
-                <div class="col-md-4">
-                    <strong>Order Number</strong>
-                    <p>{{ $order->order_number }}</p>
-                </div>
+                <div class="col-md-4 mb-3">
 
-                <div class="col-md-4">
-                    <strong>Status</strong>
-                    <p>
-                        <span class="badge bg-warning text-dark">
-                            {{ ucfirst($order->status) }}
-                        </span>
+                    <strong>
+                        Order Number
+                    </strong>
+
+                    <p class="mb-0">
+                        {{ $order->order_number }}
                     </p>
+
                 </div>
 
-                <div class="col-md-4">
-                    <strong>Order Date</strong>
-                    <p>
+
+                <div class="col-md-4 mb-3">
+
+                    <strong>
+                        Status
+                    </strong>
+
+                    <p class="mb-0">
+
+                        @if ($order->status === 'paid')
+
+                            <span class="badge bg-success">
+                                Paid
+                            </span>
+
+                        @elseif ($order->status === 'pending')
+
+                            <span class="badge bg-warning text-dark">
+                                Pending
+                            </span>
+
+                        @else
+
+                            <span class="badge bg-secondary">
+                                {{ ucfirst($order->status) }}
+                            </span>
+
+                        @endif
+
+                    </p>
+
+                </div>
+
+
+                <div class="col-md-4 mb-3">
+
+                    <strong>
+                        Order Date
+                    </strong>
+
+                    <p class="mb-0">
                         {{ $order->created_at->format('Y-m-d H:i') }}
                     </p>
+
                 </div>
 
             </div>
@@ -74,25 +135,44 @@
 
     </div>
 
-    <div class="card shadow-sm">
+
+    {{-- Ordered Medicines --}}
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+                Ordered Medicines
+            </h5>
+
+        </div>
 
         <div class="card-body">
 
-            <h5 class="mb-3">
-                Medicines
-            </h5>
-
             <div class="table-responsive">
 
-                <table class="table align-middle">
+                <table class="table align-middle mb-0">
 
                     <thead>
 
                         <tr>
-                            <th>Medicine</th>
-                            <th>Unit Price</th>
-                            <th>Quantity</th>
-                            <th>Line Total</th>
+
+                            <th>
+                                Medicine
+                            </th>
+
+                            <th>
+                                Unit Price
+                            </th>
+
+                            <th>
+                                Quantity
+                            </th>
+
+                            <th class="text-end">
+                                Amount
+                            </th>
+
                         </tr>
 
                     </thead>
@@ -108,15 +188,21 @@
                                 </td>
 
                                 <td>
-                                    Rs. {{ number_format((float) $item->unit_price, 2) }}
+                                    Rs. {{ number_format(
+                                        (float) $item->unit_price,
+                                        2
+                                    ) }}
                                 </td>
 
                                 <td>
                                     {{ $item->quantity }}
                                 </td>
 
-                                <td>
-                                    Rs. {{ number_format((float) $item->line_total, 2) }}
+                                <td class="text-end">
+                                    Rs. {{ number_format(
+                                        (float) $item->line_total,
+                                        2
+                                    ) }}
                                 </td>
 
                             </tr>
@@ -129,14 +215,78 @@
 
             </div>
 
-            <hr>
+        </div>
 
-            <div class="d-flex justify-content-end">
+    </div>
 
-                <h4>
-                    Total:
-                    Rs. {{ number_format((float) $order->total_amount, 2) }}
-                </h4>
+
+    {{-- Billing Summary --}}
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+                Billing Summary
+            </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            @if ($order->subtotal_amount !== null)
+
+                <div class="d-flex justify-content-between mb-2">
+
+                    <span>
+                        Subtotal
+                    </span>
+
+                    <strong>
+                        Rs. {{ number_format(
+                            (float) $order->subtotal_amount,
+                            2
+                        ) }}
+                    </strong>
+
+                </div>
+
+
+                <div class="d-flex justify-content-between mb-2">
+
+                    <span>
+                        VAT
+                        ({{ number_format(
+                            (float) $order->vat_rate,
+                            2
+                        ) }}%)
+                    </span>
+
+                    <strong>
+                        Rs. {{ number_format(
+                            (float) $order->vat_amount,
+                            2
+                        ) }}
+                    </strong>
+
+                </div>
+
+                <hr>
+
+            @endif
+
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <h5 class="mb-0">
+                    Grand Total
+                </h5>
+
+                <h5 class="mb-0">
+                    Rs. {{ number_format(
+                        (float) $order->total_amount,
+                        2
+                    ) }}
+                </h5>
 
             </div>
 
@@ -144,7 +294,17 @@
 
     </div>
 
-    <div class="card shadow-sm mt-4">
+
+    {{-- Payment --}}
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header">
+
+            <h5 class="mb-0">
+                Payment
+            </h5>
+
+        </div>
 
         <div class="card-body">
 
@@ -152,69 +312,150 @@
 
                 <div>
 
-                    <h5>
-                        Payment
-                    </h5>
+                    @if ($latestPayment)
 
-                    @if ($order->payments->isEmpty())
+                        {{-- Payment Status --}}
+                        <p class="mb-2">
 
-                        <p class="text-muted mb-0">
-                            No payment has been initiated yet.
+                            <strong>
+                                Status:
+                            </strong>
+
+                            @if ($latestPayment->status->value === 'successful')
+
+                                <span class="badge bg-success">
+                                    Successful
+                                </span>
+
+                            @elseif ($latestPayment->status->value === 'pending')
+
+                                <span class="badge bg-warning text-dark">
+                                    Pending
+                                </span>
+
+                            @elseif ($latestPayment->status->value === 'failed')
+
+                                <span class="badge bg-danger">
+                                    Failed
+                                </span>
+
+                            @elseif ($latestPayment->status->value === 'cancelled')
+
+                                <span class="badge bg-secondary">
+                                    Cancelled
+                                </span>
+
+                            @elseif ($latestPayment->status->value === 'refunded')
+
+                                <span class="badge bg-info text-dark">
+                                    Refunded
+                                </span>
+
+                            @else
+
+                                <span class="badge bg-secondary">
+                                    {{ ucfirst($latestPayment->status->value) }}
+                                </span>
+
+                            @endif
+
                         </p>
 
-                    @else
 
-                        @php
-                            $latestPayment = $order->payments
-                                ->sortByDesc('id')
-                                ->first();
-                        @endphp
+                        {{-- Payment Reference --}}
+                        <p class="mb-2">
 
-                        <p class="mb-1">
-                            <strong>Status:</strong>
-                            {{ ucfirst($latestPayment->status->value) }}
-                        </p>
+                            <strong>
+                                Payment Reference:
+                            </strong>
 
-                        <p class="mb-1">
-                            <strong>Reference:</strong>
                             {{ $latestPayment->transaction_reference }}
+
                         </p>
 
-                        <p class="mb-0">
-                            <strong>Amount:</strong>
+
+                        {{-- Payment Amount --}}
+                        <p class="mb-2">
+
+                            <strong>
+                                Amount:
+                            </strong>
+
                             Rs. {{ number_format(
                                 (float) $latestPayment->amount,
                                 2
                             ) }}
+
+                        </p>
+
+
+                        {{-- Paid Date --}}
+                        @if ($latestPayment->paid_at)
+
+                            <p class="mb-0">
+
+                                <strong>
+                                    Paid At:
+                                </strong>
+
+                                {{ $latestPayment->paid_at->format('Y-m-d H:i') }}
+
+                            </p>
+
+                        @endif
+
+
+                        {{-- Receipt --}}
+                        @if ($latestPayment->status->value === 'successful')
+
+                            <div class="mt-3">
+
+                                <a
+                                    href="{{ route('orders.receipt', $order) }}"
+                                    class="btn btn-outline-primary"
+                                >
+                                    View Receipt
+                                </a>
+
+                            </div>
+
+                        @endif
+
+                    @else
+
+                        <p class="text-muted mb-0">
+                            This order has not been paid yet.
                         </p>
 
                     @endif
 
                 </div>
 
-                @if (
-                    $order->status === 'pending'
-                    && (
-                        $order->payments->isEmpty()
-                        || in_array(
-                            $order->payments
-                                ->sortByDesc('id')
-                                ->first()
-                                ->status
-                                ->value,
-                            ['failed', 'cancelled']
+
+                {{-- Pay Button --}}
+                @can('pay', $order)
+
+                    @if (
+                        $order->status === 'pending'
+                        && (
+                            !$latestPayment
+                            || in_array(
+                                $latestPayment->status->value,
+                                ['failed', 'cancelled']
+                            )
                         )
                     )
-                )
 
-                    <a
-                        href="{{ route('payments.create', $order) }}"
-                        class="btn btn-success"
-                    >
-                        Pay Now
-                    </a>
+                        <a
+                            href="{{ route('payments.create', $order) }}"
+                            class="btn btn-success"
+                        >
+                            Pay Order
+                        </a>
 
-                @endif
+                    @endif
+
+                @endcan
 
             </div>
 
