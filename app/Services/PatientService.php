@@ -16,7 +16,7 @@ class PatientService
         return Patient::latest()->paginate($perPage);
     }
 
-        /**
+    /*
      * Create a patient profile for the given user.
      */
     public function createProfile(User $user, array $data): Patient

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Enums\UserRole;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Notifications\RegistrationSuccessful;
 
 class AuthService
 {
@@ -17,9 +18,13 @@ class AuthService
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'date_of_birth' => $data['date_of_birth'],
+            'gender' => $data['gender'],
             'password' => Hash::make($data['password']),
             'role' => UserRole::PATIENT->value,
         ]);
+
+            $user->notify(new RegistrationSuccessful());
 
             return $user;
     }

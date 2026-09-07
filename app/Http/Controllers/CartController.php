@@ -7,6 +7,7 @@ use App\Models\Medicine;
 use App\Services\CartService;
 use App\Http\Requests\CheckoutRequest;
 use App\Services\OrderService;
+use App\Notifications\OrderPlaced;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -101,6 +102,10 @@ class CartController extends Controller
             $order = $this->orderService->checkout(
                 $request->user()->patient,
                 $cartItems
+            );
+
+            $request->user()->notify(
+            new OrderPlaced($order)
             );
 
             $this->cartService->clear();

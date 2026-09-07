@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Enums\Gender;
+use Illuminate\Validation\Rule;
 
 class RegisterRequest extends FormRequest
 {
@@ -30,6 +32,17 @@ class RegisterRequest extends FormRequest
                 'min:8',
                 'confirmed',
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/',//atleast one uppercase, lowercase, special, number
+            ],
+
+            'date_of_birth' => [
+                'required',
+                'date',
+                'before:today',
+            ],
+
+            'gender' => [
+                'required',
+                Rule::enum(Gender::class),
             ],
         ];
     }

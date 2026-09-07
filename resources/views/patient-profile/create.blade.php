@@ -151,7 +151,8 @@
                                     type="date"
                                     id="date_of_birth"
                                     name="date_of_birth"
-                                    value="{{ old('date_of_birth') }}"
+                                    value="{{ auth()->user()->date_of_birth?->format('Y-m-d') }}"
+                                    readonly
                                     class="form-control @error('date_of_birth') is-invalid @enderror"
                                     required
                                 >

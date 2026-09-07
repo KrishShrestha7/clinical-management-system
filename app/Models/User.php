@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Enums\Gender;
 
 class User extends Authenticatable
 {
@@ -24,6 +25,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'date_of_birth',
+        'gender',
     ];
 
     /**
@@ -45,6 +48,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'role' => UserRole::class,
+        'date_of_birth' => 'date',
+        'gender' => Gender::class,
     ];
 
     /**

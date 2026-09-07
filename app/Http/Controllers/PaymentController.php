@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\InitiatePaymentRequest;
 use App\Models\Order;
 use App\Services\PaymentService;
+use App\Notifications\PaymentSuccessful;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -44,6 +45,10 @@ class PaymentController extends Controller
                     ->processSimplePayment(
                         $request->user()->patient,
                         $order
+                    );
+
+                $request->user()->notify(
+                new PaymentSuccessful($order, $payment)
                     );
 
                 return redirect()

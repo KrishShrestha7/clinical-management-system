@@ -73,6 +73,70 @@
                         </div>
 
                         <div class="mb-3">
+                            <label
+                                for="date_of_birth"
+                                class="form-label"
+                            >
+                                Date of Birth
+                            </label>
+
+                            <input
+                                type="date"
+                                name="date_of_birth"
+                                id="date_of_birth"
+                                class="form-control @error('date_of_birth') is-invalid @enderror"
+                                value="{{ old('date_of_birth') }}"
+                                required
+                            >
+
+                            @error('date_of_birth')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label
+                                for="gender"
+                                class="form-label"
+                            >
+                                Gender
+                            </label>
+
+                            <select
+                                name="gender"
+                                id="gender"
+                                class="form-select @error('gender') is-invalid @enderror"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Gender
+                                </option>
+
+                                @foreach (\App\Enums\Gender::cases() as $gender)
+
+                                    <option
+                                        value="{{ $gender->value }}"
+                                        @selected(old('gender') === $gender->value)
+                                    >
+                                        {{ $gender->value }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                            @error('gender')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label for="password" class="form-label">
                                 Password
                             </label>
