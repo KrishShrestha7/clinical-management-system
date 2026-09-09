@@ -19,8 +19,25 @@ class MedicineCatalogController extends Controller
      */
     public function index(): View
     {
-        $medicines = $this->medicineService->getAvailablePaginated();
+        $patient = auth()->user()->patient;
 
-        return view('medicines.catalog', compact('medicines'));
+        $medicines = $this->medicineService
+            ->getAvailablePaginated();
+
+        $latestPrescriptions = $patient
+            ? $patient->prescriptions()
+                ->latest()
+                ->get()
+                ->unique('medicine_id')
+                ->keyBy('medicine_id')
+            : collect();
+
+        return view(
+            'medicines.catalog',
+            compact(
+                'medicines',
+                'latestPrescriptions'
+            )
+        );
     }
 }

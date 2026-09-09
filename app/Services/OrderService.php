@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Medicine;
 use App\Models\Order;
 use App\Models\Patient;
+use App\Enums\PrescriptionStatus;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -90,9 +91,19 @@ class OrderService
                 }
 
                 if ($medicine->requires_prescription) {
-                    throw new DomainException(
-                        "{$medicine->name} requires a prescription and cannot be ordered until prescription approval is implemented."
-                    );
+                    $hasApprovedPrescription = $patient->prescriptions()
+                        ->where('medicine_id', $medicine->id)
+                        ->where(
+                            'status',
+                            PrescriptionStatus::APPROVED->value
+                        )
+                        ->exists();
+
+                    if (!$hasApprovedPrescription) {
+                        throw new DomainException(
+                            "{$medicine->name} requires an approved prescription before checkout."
+                        );
+                    }
                 }
 
                 $unitPrice = (float) $medicine->price;

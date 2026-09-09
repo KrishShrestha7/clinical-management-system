@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Admin\MedicineController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PatientProfileController;
@@ -8,6 +9,12 @@ use App\Http\Controllers\MedicineCatalogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PrescriptionController;
+use App\Http\Controllers\Admin\PrescriptionController as AdminPrescriptionController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\PatientController as AdminPatientController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -83,8 +90,69 @@ Route::middleware('auth')->group(function () {
         [OrderController::class, 'receipt']
     )->name('orders.receipt');
 
+    Route::post(
+        '/medicines/{medicine}/prescription',
+        [PrescriptionController::class, 'store']
+    )->name('prescriptions.store');
+
     Route::resource('patients', PatientController::class);
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
 });
+
+
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        Route::get(
+            '/dashboard',
+            [AdminDashboardController::class, 'index']
+        )->name('dashboard');
+
+        Route::resource('medicines', MedicineController::class)
+        ->except(['show']);
+
+        Route::get(
+            '/prescriptions',
+            [AdminPrescriptionController::class, 'index']
+        )->name('prescriptions.index');
+
+        Route::patch(
+            '/prescriptions/{prescription}/approve',
+            [AdminPrescriptionController::class, 'approve']
+        )->name('prescriptions.approve');
+
+        Route::patch(
+            '/prescriptions/{prescription}/reject',
+            [AdminPrescriptionController::class, 'reject']
+        )->name('prescriptions.reject');
+
+        Route::get(
+            '/orders',
+            [AdminOrderController::class, 'index']
+        )->name('orders.index');
+
+        Route::get(
+            '/orders/{order}',
+            [AdminOrderController::class, 'show']
+        )->name('orders.show');
+
+        Route::get(
+            '/payments',
+            [AdminPaymentController::class, 'index']
+        )->name('payments.index');
+
+        Route::get(
+            '/patients',
+            [AdminPatientController::class, 'index']
+        )->name('patients.index');
+
+        Route::get(
+            '/patients/{patient}',
+            [AdminPatientController::class, 'show']
+        )->name('patients.show');
+
+    });

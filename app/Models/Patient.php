@@ -49,4 +49,9 @@ class Patient extends Model
     {
         return $this->hasOne(Cart::class);
     }
+
+    public function prescriptions(): HasMany
+    {
+        return $this->hasMany(Prescription::class);
+    }
 }
