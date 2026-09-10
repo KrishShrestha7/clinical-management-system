@@ -29,12 +29,14 @@
 
     <div class="container">
 
-        <a
-            href="{{ route('dashboard') }}"
-            class="navbar-brand"
-        >
-            Clinical Management System
-        </a>
+            <a
+                href="{{ auth()->check() && auth()->user()->isAdmin()
+                    ? route('admin.dashboard')
+                    : route('dashboard') }}"
+                class="navbar-brand"
+            >
+                Clinical Management System
+            </a>
 
         @auth
 

@@ -67,9 +67,13 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
-            return redirect()->intended(
-                route('dashboard')
-            );
+            $user = $request->user();
+
+            $dashboardRoute = $user->isAdmin()
+                ? route('admin.dashboard')
+                : route('dashboard');
+
+            return redirect()->intended($dashboardRoute);
         } catch (Throwable $exception) {
             report($exception);
 
