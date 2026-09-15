@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PatientController as AdminPatientController;
+use App\Http\Controllers\Admin\StaffController as AdminStaffController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -32,6 +34,16 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('/login', [AuthController::class, 'login']);
+
+    Route::get(
+        '/reset-password/{token}',
+        [ResetPasswordController::class, 'showResetForm']
+    )->name('password.reset');
+
+    Route::post(
+        '/reset-password',
+        [ResetPasswordController::class, 'reset']
+    )->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
@@ -155,4 +167,41 @@ Route::middleware(['auth', 'admin'])
             [AdminPatientController::class, 'show']
         )->name('patients.show');
 
+        Route::get(
+            '/staff',
+            [AdminStaffController::class, 'index']
+        )->name('staff.index');
+
+        Route::get(
+            '/staff/create',
+            [AdminStaffController::class, 'create']
+        )->name('staff.create');
+
+        Route::post(
+            '/staff',
+            [AdminStaffController::class, 'store']
+        )->name('staff.store');
+
+        Route::get(
+            '/staff/{staff}',
+            [AdminStaffController::class, 'show']
+        )->name('staff.show');
+
+        Route::get(
+            '/staff/{staff}/edit',
+            [AdminStaffController::class, 'edit']
+        )->name('staff.edit');
+
+        Route::put(
+            '/staff/{staff}',
+            [AdminStaffController::class, 'update']
+        )->name('staff.update');
+
+        Route::post(
+            '/staff/{staff}/password-reset',
+            [AdminStaffController::class, 'sendPasswordReset']
+        )->name('staff.password-reset');
+
     });
+
+

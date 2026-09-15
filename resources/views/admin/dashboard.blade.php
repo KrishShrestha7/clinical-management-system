@@ -277,6 +277,13 @@
                 </a>
 
                 <a
+                    href="{{ route('admin.staff.index') }}"
+                    class="btn btn-primary"
+                >
+                    Manage Staff
+                </a>
+
+                <a
                     href="{{ route('admin.orders.index') }}"
                     class="btn btn-outline-primary"
                 >

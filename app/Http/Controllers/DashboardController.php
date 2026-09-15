@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         return match ($user->role) {
-            UserRole::ADMIN => redirect()->route('dashboard.admin'),
+            UserRole::ADMIN => redirect()->route('admin.dashboard'),
             UserRole::DOCTOR => view('dashboard.doctor'),
             UserRole::RECEPTIONIST => view('dashboard.receptionist'),
             UserRole::PATIENT => view('dashboard.patient'),
