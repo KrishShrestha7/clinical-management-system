@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Enums\Gender;
 
 class User extends Authenticatable
@@ -89,5 +90,10 @@ class User extends Authenticatable
     public function patient(): HasOne
     {
         return $this->hasOne(Patient::class);
+    }
+
+    public function createdAppointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class, 'created_by');
     }
 }

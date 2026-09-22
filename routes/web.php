@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PatientController as AdminPatientController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 
@@ -108,6 +109,26 @@ Route::middleware('auth')->group(function () {
     )->name('prescriptions.store');
 
     Route::resource('patients', PatientController::class);
+
+    Route::get(
+        '/appointments',
+        [AppointmentController::class, 'index']
+    )->name('appointments.index');
+
+    Route::get(
+        '/appointments/create',
+        [AppointmentController::class, 'create']
+    )->name('appointments.create');
+
+    Route::post(
+        '/appointments',
+        [AppointmentController::class, 'store']
+    )->name('appointments.store');
+
+    Route::get(
+        '/appointments/{appointment}',
+        [AppointmentController::class, 'show']
+    )->name('appointments.show');
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');

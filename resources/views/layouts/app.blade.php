@@ -22,29 +22,84 @@
 </head>
 
 <body>
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-></script>
+
 <nav class="navbar navbar-dark bg-dark">
 
     <div class="container">
 
-            <a
-                href="{{ auth()->check() && auth()->user()->isAdmin()
-                    ? route('admin.dashboard')
-                    : route('dashboard') }}"
-                class="navbar-brand"
-            >
-                Clinical Management System
-            </a>
+        {{-- Brand / Dashboard --}}
+        <a
+            href="{{ auth()->check() && auth()->user()->isAdmin()
+                ? route('admin.dashboard')
+                : route('dashboard') }}"
+            class="navbar-brand"
+        >
+            Clinical Management System
+        </a>
+
 
         @auth
 
             <div class="d-flex align-items-center gap-3">
 
+
+                {{-- Patient Navigation --}}
+                @if (auth()->user()->isPatient())
+
+                    <a
+                        href="{{ route('appointments.index') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        My Appointments
+                    </a>
+
+                    <a
+                        href="{{ route('medicines.catalog') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        Medicines
+                    </a>
+
+                    <a
+                        href="{{ route('orders.index') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        My Orders
+                    </a>
+
+                    <a
+                        href="{{ route('patient-profile.show') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        My Profile
+                    </a>
+
+                @endif
+
+
+                {{-- Admin Navigation --}}
+                @if (auth()->user()->isAdmin())
+
+                    <a
+                        href="{{ route('admin.patients.index') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        Patients
+                    </a>
+
+                    <a
+                        href="{{ route('admin.staff.index') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        Staff
+                    </a>
+
+                @endif
+
+
+                {{-- Doctor / Receptionist Navigation --}}
                 @if (
-                    auth()->user()->isAdmin()
-                    || auth()->user()->isDoctor()
+                    auth()->user()->isDoctor()
                     || auth()->user()->isReceptionist()
                 )
 
@@ -57,13 +112,18 @@
 
                 @endif
 
+
+                {{-- Logged-in User Name --}}
                 <span class="text-white">
                     {{ auth()->user()->name }}
                 </span>
 
+
+                {{-- Logout --}}
                 <form
                     method="POST"
                     action="{{ route('logout') }}"
+                    class="mb-0"
                 >
 
                     @csrf
@@ -85,13 +145,18 @@
 
 </nav>
 
+
 <main>
 
     @yield('content')
 
 </main>
 
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
 </body>
 
 </html>
-
