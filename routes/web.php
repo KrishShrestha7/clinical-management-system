@@ -16,6 +16,10 @@ use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PatientController as AdminPatientController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
+use App\Http\Controllers\Receptionist\AppointmentController as ReceptionistAppointmentController;
+use App\Http\Controllers\Receptionist\DashboardController as ReceptionistDashboardController;
+use App\Http\Controllers\Doctor\AppointmentController as DoctorAppointmentController;
+use App\Http\Controllers\Doctor\DashboardController as DoctorDashboardController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
@@ -225,4 +229,79 @@ Route::middleware(['auth', 'admin'])
 
     });
 
+Route::middleware(['auth', 'receptionist'])
+    ->prefix('receptionist')
+    ->name('receptionist.')
+    ->group(function () {
 
+        Route::get(
+            '/appointments',
+            [ReceptionistAppointmentController::class, 'index']
+        )->name('appointments.index');
+
+        Route::get(
+            '/appointments/{appointment}',
+            [ReceptionistAppointmentController::class, 'show']
+        )->name('appointments.show');
+
+        Route::patch(
+            '/appointments/{appointment}/confirm',
+            [ReceptionistAppointmentController::class, 'confirm']
+        )->name('appointments.confirm');
+
+        Route::patch(
+            '/appointments/{appointment}/cancel',
+            [ReceptionistAppointmentController::class, 'cancel']
+        )->name('appointments.cancel');
+
+        Route::patch(
+            '/appointments/{appointment}/reschedule',
+            [ReceptionistAppointmentController::class, 'reschedule']
+        )->name('appointments.reschedule');
+
+        Route::get(
+            '/appointments/create',
+            [ReceptionistAppointmentController::class, 'create']
+        )->name('appointments.create');
+
+        Route::post(
+            '/appointments',
+            [ReceptionistAppointmentController::class, 'store']
+        )->name('appointments.store');
+
+        Route::get(
+            '/dashboard',
+            [ReceptionistDashboardController::class, 'index']
+        )->name('dashboard');
+    });
+
+Route::middleware(['auth', 'doctor'])
+    ->prefix('doctor')
+    ->name('doctor.')
+    ->group(function () {
+
+        Route::get(
+            '/dashboard',
+            [DoctorDashboardController::class, 'index']
+        )->name('dashboard');
+
+        Route::get(
+            '/appointments',
+            [DoctorAppointmentController::class, 'index']
+        )->name('appointments.index');
+
+        Route::get(
+            '/appointments/{appointment}',
+            [DoctorAppointmentController::class, 'show']
+        )->name('appointments.show');
+
+        Route::patch(
+            '/appointments/{appointment}/complete',
+            [DoctorAppointmentController::class, 'complete']
+        )->name('appointments.complete');
+
+        Route::get(
+            '/appointments/{appointment}/patient',
+            [DoctorAppointmentController::class, 'patient']
+        )->name('appointments.patient');
+    });

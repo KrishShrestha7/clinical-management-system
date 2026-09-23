@@ -96,11 +96,22 @@
 
                 @endif
 
+                @if (auth()->user()->isReceptionist())
 
-                {{-- Doctor / Receptionist Navigation --}}
+                    <a
+                        href="{{ route('receptionist.dashboard') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        Receptionist Dashboard
+                    </a>
+
+                @endif
+
+
+                {{-- Doctor / Navigation --}}
                 @if (
                     auth()->user()->isDoctor()
-                    || auth()->user()->isReceptionist()
+
                 )
 
                     <a

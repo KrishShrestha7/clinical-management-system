@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Enums\Gender;
 use Illuminate\Validation\Rule;
+use App\Models\Patient;
 
 class StorePatientRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class StorePatientRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('create', Patient::class) ?? false;
     }
 
     /**

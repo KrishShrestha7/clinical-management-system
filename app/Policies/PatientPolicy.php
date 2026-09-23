@@ -70,7 +70,8 @@ class PatientPolicy
     public function update(User $user, Patient $patient): bool
     {
         return $user->isAdmin()
-            || $user->isDoctor();
+            || $user->isDoctor()
+            || $user->isReceptionist();
     }
 
     /**

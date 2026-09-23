@@ -163,4 +163,102 @@ class AppointmentService
 
         return $appointment->fresh();
     }
+
+    public function reschedule(
+        Appointment $appointment,
+        string $scheduledAt
+    ): Appointment {
+        return DB::transaction(function () use (
+            $appointment,
+            $scheduledAt
+        ) {
+            if (
+                ! in_array(
+                    $appointment->status,
+                    [
+                        AppointmentStatus::PENDING,
+                        AppointmentStatus::CONFIRMED,
+                    ],
+                    true
+                )
+            ) {
+                throw new DomainException(
+                    'Only pending or confirmed appointments can be rescheduled.'
+                );
+            }
+
+            $newScheduledAt = Carbon::parse($scheduledAt);
+
+            if (! $newScheduledAt->isFuture()) {
+                throw new DomainException(
+                    'The new appointment time must be in the future.'
+                );
+            }
+
+            $doctorHasConflict = Appointment::query()
+                ->where('doctor_id', $appointment->doctor_id)
+                ->where('id', '!=', $appointment->id)
+                ->where(
+                    'scheduled_at',
+                    $newScheduledAt
+                )
+                ->whereIn('status', [
+                    AppointmentStatus::PENDING->value,
+                    AppointmentStatus::CONFIRMED->value,
+                ])
+                ->exists();
+
+            if ($doctorHasConflict) {
+                throw new DomainException(
+                    'The selected doctor already has an appointment at this time.'
+                );
+            }
+
+            $patientHasConflict = Appointment::query()
+                ->where('patient_id', $appointment->patient_id)
+                ->where('id', '!=', $appointment->id)
+                ->where(
+                    'scheduled_at',
+                    $newScheduledAt
+                )
+                ->whereIn('status', [
+                    AppointmentStatus::PENDING->value,
+                    AppointmentStatus::CONFIRMED->value,
+                ])
+                ->exists();
+
+            if ($patientHasConflict) {
+                throw new DomainException(
+                    'The patient already has an appointment at this time.'
+                );
+            }
+
+            $appointment->update([
+                'scheduled_at' => $newScheduledAt,
+            ]);
+
+            return $appointment->fresh();
+        });
+    }
+
+    public function getPatients(): Collection
+    {
+        return Patient::query()
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function getDoctorAppointments(
+        Staff $doctor,
+        int $perPage = 10
+    ): LengthAwarePaginator {
+        return Appointment::query()
+            ->where('doctor_id', $doctor->id)
+            ->with([
+                'patient',
+                'doctor.user',
+            ])
+            ->latest('scheduled_at')
+            ->paginate($perPage);
+    }
 }
