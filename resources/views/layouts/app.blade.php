@@ -27,11 +27,21 @@
 
     <div class="container">
 
-        {{-- Brand / Dashboard --}}
+        {{-- Dashboard / Home --}}
         <a
-            href="{{ auth()->check() && auth()->user()->isAdmin()
-                ? route('admin.dashboard')
-                : route('dashboard') }}"
+            href="{{
+                auth()->user()->isAdmin()
+                    ? route('admin.dashboard')
+                    : (
+                        auth()->user()->isReceptionist()
+                            ? route('receptionist.dashboard')
+                            : (
+                                auth()->user()->isDoctor()
+                                    ? route('doctor.dashboard')
+                                    : route('dashboard')
+                            )
+                    )
+            }}"
             class="navbar-brand"
         >
             Clinical Management System
@@ -96,29 +106,56 @@
 
                 @endif
 
+
+                {{-- Receptionist Navigation --}}
                 @if (auth()->user()->isReceptionist())
 
                     <a
                         href="{{ route('receptionist.dashboard') }}"
                         class="text-white text-decoration-none"
                     >
-                        Receptionist Dashboard
+                        Dashboard
                     </a>
-
-                @endif
-
-
-                {{-- Doctor / Navigation --}}
-                @if (
-                    auth()->user()->isDoctor()
-
-                )
 
                     <a
                         href="{{ route('patients.index') }}"
                         class="text-white text-decoration-none"
                     >
                         Patients
+                    </a>
+
+                    <a
+                        href="{{ route('receptionist.appointments.index') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        Appointments
+                    </a>
+
+                    <a
+                        href="{{ route('receptionist.orders.index') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        Orders
+                    </a>
+
+                @endif
+
+
+                {{-- Doctor Navigation --}}
+                @if (auth()->user()->isDoctor())
+
+                    <a
+                        href="{{ route('doctor.dashboard') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        Dashboard
+                    </a>
+
+                    <a
+                        href="{{ route('doctor.appointments.index') }}"
+                        class="text-white text-decoration-none"
+                    >
+                        My Appointments
                     </a>
 
                 @endif

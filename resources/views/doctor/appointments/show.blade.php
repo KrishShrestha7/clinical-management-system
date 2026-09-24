@@ -336,125 +336,100 @@
 
 
     {{-- Appointment Actions --}}
-    @if (
-        in_array(
-            $appointment->status->value,
-            ['pending', 'confirmed']
-        )
-    )
+    <div class="card shadow-sm">
 
-        <div class="card shadow-sm">
+        <div class="card-header">
 
-            <div class="card-header">
+            <h5 class="mb-0">
+                Appointment Actions
+            </h5>
 
-                <h5 class="mb-0">
-                    Appointment Actions
-                </h5>
+        </div>
 
-            </div>
+        <div class="card-body">
 
-            <div class="card-body">
+            {{-- Patient and History Actions --}}
+            <div class="d-flex flex-wrap gap-2">
 
-                <div class="d-flex flex-wrap gap-2">
+                {{-- View Patient --}}
+                <a
+                    href="{{ route(
+                        'doctor.appointments.patient',
+                        $appointment
+                    ) }}"
+                    class="btn btn-outline-primary"
+                >
+                    View Patient
+                </a>
 
-                    {{-- View Patient --}}
-                    <a
-                        href="{{ route(
-                            'doctor.appointments.patient',
+
+                {{-- View Clinical History --}}
+                <a
+                    href="{{ route(
+                        'doctor.appointments.history',
+                        $appointment
+                    ) }}"
+                    class="btn btn-outline-info"
+                >
+                    View Clinical History
+                </a>
+
+
+                {{-- Complete Appointment --}}
+                @if ($appointment->status->value === 'confirmed')
+
+                    <form
+                        method="POST"
+                        action="{{ route(
+                            'doctor.appointments.complete',
                             $appointment
                         ) }}"
-                        class="btn btn-outline-primary"
+                        onsubmit="return confirm(
+                            'Mark this appointment as completed?'
+                        )"
                     >
-                        View Patient
-                    </a>
 
+                        @csrf
+                        @method('PATCH')
 
-                    {{-- Complete Appointment --}}
-                    @if ($appointment->status->value === 'confirmed')
-
-                        <form
-                            method="POST"
-                            action="{{ route(
-                                'doctor.appointments.complete',
-                                $appointment
-                            ) }}"
-                            onsubmit="return confirm(
-                                'Mark this appointment as completed?'
-                            )"
+                        <button
+                            type="submit"
+                            class="btn btn-success"
                         >
+                            Mark Appointment as Completed
+                        </button>
 
-                            @csrf
-                            @method('PATCH')
+                    </form>
 
-                            <button
-                                type="submit"
-                                class="btn btn-success"
-                            >
-                                Mark Appointment as Completed
-                            </button>
+                @endif
 
-                        </form>
+            </div>
 
-                    @endif
 
+            {{-- Status Messages --}}
+            @if ($appointment->status->value === 'pending')
+
+                <div class="alert alert-warning mt-3 mb-0">
+                    This appointment is still pending receptionist confirmation.
                 </div>
 
-            </div>
+            @elseif ($appointment->status->value === 'completed')
 
-        </div>
-
-
-    @elseif ($appointment->status->value === 'completed')
-
-        <div class="card shadow-sm">
-
-            <div class="card-header">
-
-                <h5 class="mb-0">
-                    Appointment Actions
-                </h5>
-
-            </div>
-
-            <div class="card-body">
-
-                <div class="d-flex flex-wrap gap-2">
-
-                    <a
-                        href="{{ route(
-                            'doctor.appointments.patient',
-                            $appointment
-                        ) }}"
-                        class="btn btn-outline-primary"
-                    >
-                        View Patient
-                    </a>
-
-                    <span class="alert alert-success mb-0 py-2">
-                        This appointment has been completed.
-                    </span>
-
+                <div class="alert alert-success mt-3 mb-0">
+                    This appointment has been completed.
                 </div>
 
-            </div>
+            @elseif ($appointment->status->value === 'cancelled')
+
+                <div class="alert alert-danger mt-3 mb-0">
+                    This appointment has been cancelled.
+                </div>
+
+            @endif
 
         </div>
 
-
-    @elseif ($appointment->status->value === 'pending')
-
-        <div class="alert alert-warning">
-            This appointment is still pending receptionist confirmation.
-        </div>
-
-
-    @elseif ($appointment->status->value === 'cancelled')
-
-        <div class="alert alert-danger">
-            This appointment has been cancelled.
-        </div>
-
-    @endif
+    </div>
 
 </div>
 

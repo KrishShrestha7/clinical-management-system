@@ -128,4 +128,33 @@ class AppointmentController extends Controller
             ]
         );
     }
+
+    public function history(
+        Appointment $appointment
+    ): View {
+        $doctor = auth()->user()->staff;
+
+        if (
+            !$doctor ||
+            $appointment->doctor_id !== $doctor->id
+        ) {
+            abort(403);
+        }
+
+        $history = $this->appointmentService->getPatientHistory(
+            $appointment->patient,
+            $doctor
+        );
+
+        return view(
+            'doctor.patients.history',
+            [
+                'patient' => $appointment->patient,
+                'appointment' => $appointment,
+                'appointments' => $history['appointments'],
+                'prescriptions' => $history['prescriptions'],
+                'orders' => $history['orders'],
+            ]
+        );
+    }
 }

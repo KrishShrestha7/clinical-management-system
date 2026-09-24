@@ -175,6 +175,13 @@
                     Create Appointment
                 </a>
 
+                <a
+                    href="{{ route('receptionist.orders.index') }}"
+                    class="btn btn-outline-secondary"
+                >
+                    View Orders
+                </a>
+
             </div>
 
         </div>

@@ -261,4 +261,42 @@ class AppointmentService
             ->latest('scheduled_at')
             ->paginate($perPage);
     }
+
+    public function getPatientHistory(
+        Patient $patient,
+        Staff $doctor
+    ): array {
+        $hasAppointmentWithDoctor = Appointment::query()
+            ->where('patient_id', $patient->id)
+            ->where('doctor_id', $doctor->id)
+            ->exists();
+
+        if (!$hasAppointmentWithDoctor) {
+            throw new DomainException(
+                'You are not authorized to view this patient history.'
+            );
+        }
+
+        $appointments = Appointment::query()
+            ->where('patient_id', $patient->id)
+            ->with('doctor.user')
+            ->latest('scheduled_at')
+            ->get();
+
+        $prescriptions = $patient->prescriptions()
+            ->with('medicine')
+            ->latest()
+            ->get();
+
+        $orders = $patient->orders()
+            ->with('items')
+            ->latest()
+            ->get();
+
+        return [
+            'appointments' => $appointments,
+            'prescriptions' => $prescriptions,
+            'orders' => $orders,
+        ];
+    }
 }

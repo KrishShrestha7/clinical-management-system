@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\PatientController as AdminPatientController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
 use App\Http\Controllers\Receptionist\AppointmentController as ReceptionistAppointmentController;
 use App\Http\Controllers\Receptionist\DashboardController as ReceptionistDashboardController;
+use App\Http\Controllers\Receptionist\OrderController as ReceptionistOrderController;
 use App\Http\Controllers\Doctor\AppointmentController as DoctorAppointmentController;
 use App\Http\Controllers\Doctor\DashboardController as DoctorDashboardController;
 use App\Http\Controllers\AppointmentController;
@@ -273,6 +274,21 @@ Route::middleware(['auth', 'receptionist'])
             '/dashboard',
             [ReceptionistDashboardController::class, 'index']
         )->name('dashboard');
+
+        Route::get(
+            '/orders',
+            [ReceptionistOrderController::class, 'index']
+        )->name('orders.index');
+
+        Route::get(
+            '/orders/{order}',
+            [ReceptionistOrderController::class, 'show']
+        )->name('orders.show');
+
+        Route::get(
+            '/orders/{order}/receipt',
+            [ReceptionistOrderController::class, 'receipt']
+        )->name('orders.receipt');
     });
 
 Route::middleware(['auth', 'doctor'])
@@ -304,4 +320,9 @@ Route::middleware(['auth', 'doctor'])
             '/appointments/{appointment}/patient',
             [DoctorAppointmentController::class, 'patient']
         )->name('appointments.patient');
+
+        Route::get(
+            '/appointments/{appointment}/history',
+            [DoctorAppointmentController::class, 'history']
+        )->name('appointments.history');
     });
