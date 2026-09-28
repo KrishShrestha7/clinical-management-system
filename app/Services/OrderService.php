@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Medicine;
 use App\Models\Order;
 use App\Models\Patient;
+use App\Enums\OrderStatus;
 use App\Enums\PrescriptionStatus;
 use DomainException;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,7 @@ class OrderService
     public function getOrderDetails(Order $order): Order
     {
         return $order->load([
+            'patient',
             'items.medicine',
             'payments',
         ]);
@@ -54,7 +56,7 @@ class OrderService
 
             $order = $patient->orders()->create([
                 'order_number' => $this->generateOrderNumber(),
-                'status' => 'pending',
+                'status' => OrderStatus::PENDING->value,
                 'subtotal_amount' => 0,
                 'vat_rate' => 0,
                 'vat_amount' => 0,

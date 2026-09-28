@@ -8,7 +8,8 @@ class RescheduleAppointmentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isReceptionist() ?? false;
+        return $this->user()?->isAdmin()
+            || $this->user()?->isReceptionist();
     }
 
     public function rules(): array

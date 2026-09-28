@@ -110,13 +110,13 @@
 
                     <p class="mb-0">
 
-                        @if ($order->status === 'paid')
+                        @if ($order->status->value === 'paid')
 
                             <span class="badge bg-success">
                                 Paid
                             </span>
 
-                        @elseif ($order->status === 'pending')
+                        @elseif ($order->status->value === 'pending')
 
                             <span class="badge bg-warning text-dark">
                                 Pending
@@ -125,7 +125,7 @@
                         @else
 
                             <span class="badge bg-secondary">
-                                {{ ucfirst($order->status) }}
+                                {{ ucfirst($order->status->value) }}
                             </span>
 
                         @endif

@@ -284,6 +284,13 @@
                 </a>
 
                 <a
+                    href="{{ route('admin.appointments.index') }}"
+                    class="btn btn-primary"
+                >
+                    Manage Appointments
+                </a>
+
+                <a
                     href="{{ route('admin.orders.index') }}"
                     class="btn btn-outline-primary"
                 >

@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Receptionist;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RescheduleAppointmentRequest;
-use App\Http\Requests\StoreReceptionistAppointmentRequest;
 use App\Models\Appointment;
-use App\Models\Patient;
 use App\Services\AppointmentService;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
@@ -34,80 +32,15 @@ class AppointmentController extends Controller
             ->with([
                 'patient',
                 'doctor.user',
+                'creator',
             ])
             ->latest('scheduled_at')
-            ->paginate(15);
+            ->paginate(20);
 
         return view(
-            'receptionist.appointments.index',
+            'admin.appointments.index',
             compact('appointments')
         );
-    }
-
-    /**
-     * Show the appointment creation form.
-     */
-    public function create(): View
-    {
-        $this->authorize('create', Appointment::class);
-
-        $patients = $this->appointmentService->getPatients();
-        $doctors = $this->appointmentService->getDoctors();
-
-        return view(
-            'receptionist.appointments.create',
-            compact('patients', 'doctors')
-        );
-    }
-
-    /**
-     * Create an appointment on behalf of a patient.
-     */
-    public function store(
-        StoreReceptionistAppointmentRequest $request
-    ): RedirectResponse {
-        $this->authorize('create', Appointment::class);
-
-        try {
-            $data = $request->validated();
-
-            $patient = Patient::findOrFail(
-                $data['patient_id']
-            );
-
-            $this->appointmentService->create(
-                $patient,
-                $data,
-                $request->user()
-            );
-
-            return redirect()
-                ->route('receptionist.appointments.index')
-                ->with(
-                    'success',
-                    'Appointment created successfully.'
-                );
-
-        } catch (DomainException $exception) {
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    $exception->getMessage()
-                );
-
-        } catch (Throwable $exception) {
-
-            report($exception);
-
-            return back()
-                ->withInput()
-                ->with(
-                    'error',
-                    'Appointment could not be created.'
-                );
-        }
     }
 
     /**
@@ -125,7 +58,7 @@ class AppointmentController extends Controller
         ]);
 
         return view(
-            'receptionist.appointments.show',
+            'admin.appointments.show',
             compact('appointment')
         );
     }
@@ -241,6 +174,42 @@ class AppointmentController extends Controller
                     'error',
                     'Appointment could not be rescheduled.'
                 );
+        }
+    }
+
+    /**
+     * Mark a confirmed appointment as completed.
+     */
+    public function complete(
+        Appointment $appointment
+    ): RedirectResponse {
+        $this->authorize('complete', $appointment);
+
+        try {
+            $this->appointmentService->complete(
+                $appointment
+            );
+
+            return back()->with(
+                'success',
+                'Appointment marked as completed.'
+            );
+
+        } catch (DomainException $exception) {
+
+            return back()->with(
+                'error',
+                $exception->getMessage()
+            );
+
+        } catch (Throwable $exception) {
+
+            report($exception);
+
+            return back()->with(
+                'error',
+                'Appointment could not be completed.'
+            );
         }
     }
 }

@@ -6,6 +6,7 @@ use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\Patient;
 use App\Models\Payment;
+use App\Enums\OrderStatus;
 use DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -38,7 +39,7 @@ class PaymentService
                 );
             }
 
-            if ($lockedOrder->status !== 'pending') {
+            if ($lockedOrder->status !== OrderStatus::PENDING) {
                 throw new DomainException(
                     'This order is not available for payment.'
                 );
@@ -155,7 +156,7 @@ class PaymentService
             ]);
 
             $lockedOrder->update([
-                'status' => 'paid',
+                'status' => OrderStatus::PAID->value,
             ]);
 
             return $payment;

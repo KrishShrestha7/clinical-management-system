@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePrescriptionRequest;
 use App\Models\Medicine;
+use App\Models\Prescription;
 use App\Services\PrescriptionService;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class PrescriptionController extends Controller
@@ -23,6 +25,8 @@ class PrescriptionController extends Controller
         StorePrescriptionRequest $request,
         Medicine $medicine
     ): RedirectResponse {
+        $this->authorize('create', Prescription::class);
+
         try {
             if (!$medicine->requires_prescription) {
                 throw new DomainException(
@@ -59,5 +63,29 @@ class PrescriptionController extends Controller
                 'Prescription could not be uploaded.'
             );
         }
+    }
+
+    public function file(
+        Prescription $prescription
+    ): \Symfony\Component\HttpFoundation\BinaryFileResponse {
+        $this->authorize('view', $prescription);
+
+        $filePath = storage_path(
+            'app/' . $prescription->file_path
+        );
+
+        if (!is_file($filePath)) {
+            abort(404, 'Prescription file not found.');
+        }
+
+        return response()->file(
+            $filePath,
+            [
+                'Content-Disposition' =>
+                    'inline; filename="' .
+                    basename($prescription->file_path) .
+                    '"',
+            ]
+        );
     }
 }

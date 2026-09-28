@@ -113,7 +113,10 @@
                                     <td>
 
                                         <a
-                                            href="{{ asset('storage/' . $prescription->file_path) }}"
+                                            href="{{ route(
+                                                'prescriptions.file',
+                                                $prescription
+                                            ) }}"
                                             target="_blank"
                                             class="btn btn-outline-primary btn-sm"
                                         >

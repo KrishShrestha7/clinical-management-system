@@ -70,6 +70,13 @@
                         View your upcoming appointments.
                     </p>
 
+                      <a
+                            href="{{ route('appointments.index') }}"
+                            class="btn btn-primary"
+                        >
+                            My Appointments
+                    </a>
+
                 </div>
 
             </div>

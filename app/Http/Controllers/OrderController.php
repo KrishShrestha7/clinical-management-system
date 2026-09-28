@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Services\OrderService;
+use App\Enums\OrderStatus;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -63,10 +64,10 @@ class OrderController extends Controller
                 \App\Enums\PaymentStatus::SUCCESSFUL
             );
 
-        if (
-            $order->status !== 'paid'
-            || !$successfulPayment
-        ) {
+            if (
+                $order->status !== OrderStatus::PAID
+                || !$successfulPayment
+            ) {
             return redirect()
                 ->route('orders.show', $order)
                 ->with(

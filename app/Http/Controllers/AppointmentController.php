@@ -21,6 +21,8 @@ class AppointmentController extends Controller
 
     public function index(): View
     {
+        $this->authorize('viewAny', Appointment::class);
+
         $patient = auth()->user()->patient;
 
         $appointments = $this->appointmentService
@@ -34,6 +36,8 @@ class AppointmentController extends Controller
 
     public function create(): View
     {
+        $this->authorize('create', Appointment::class);
+
         $doctors = $this->appointmentService->getDoctors();
 
         return view(
@@ -45,6 +49,8 @@ class AppointmentController extends Controller
     public function store(
         StoreAppointmentRequest $request
     ): RedirectResponse {
+        $this->authorize('create', Appointment::class);
+
         try {
             $user = $request->user();
             $patient = $user->patient;
@@ -61,19 +67,23 @@ class AppointmentController extends Controller
                     'success',
                     'Appointment request submitted successfully.'
                 );
-        } catch (DomainException $e) {
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'appointment' => $e->getMessage(),
-                ]);
-        } catch (Throwable $e) {
-            report($e);
+
+        } catch (DomainException $exception) {
 
             return back()
                 ->withInput()
                 ->withErrors([
-                    'appointment' => 'Unable to book the appointment.'
+                    'appointment' => $exception->getMessage(),
+                ]);
+
+        } catch (Throwable $exception) {
+
+            report($exception);
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'appointment' => 'Unable to book the appointment.',
                 ]);
         }
     }
@@ -81,14 +91,7 @@ class AppointmentController extends Controller
     public function show(
         Appointment $appointment
     ): View {
-        $user = auth()->user();
-
-        if (
-            ! $user->patient ||
-            $appointment->patient_id !== $user->patient->id
-        ) {
-            abort(403);
-        }
+        $this->authorize('view', $appointment);
 
         $appointment->load([
             'doctor.user',

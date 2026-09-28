@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\PrescriptionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Prescription;
+use App\Services\PrescriptionService;
+use DomainException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -12,8 +13,18 @@ use Throwable;
 
 class PrescriptionController extends Controller
 {
+    protected PrescriptionService $prescriptionService;
+
+    public function __construct(
+        PrescriptionService $prescriptionService
+    ) {
+        $this->prescriptionService = $prescriptionService;
+    }
+
     public function index(): View
     {
+        $this->authorize('viewAny', Prescription::class);
+
         $prescriptions = Prescription::query()
             ->with([
                 'patient',
@@ -33,17 +44,24 @@ class PrescriptionController extends Controller
         Request $request,
         Prescription $prescription
     ): RedirectResponse {
+        $this->authorize('approve', $prescription);
+
         try {
-            $prescription->update([
-                'status' => PrescriptionStatus::APPROVED->value,
-                'reviewed_by' => $request->user()->id,
-                'reviewed_at' => now(),
-                'rejection_reason' => null,
-            ]);
+            $this->prescriptionService->approve(
+                $prescription,
+                $request->user()
+            );
 
             return back()->with(
                 'success',
                 'Prescription approved successfully.'
+            );
+
+        } catch (DomainException $exception) {
+
+            return back()->with(
+                'error',
+                $exception->getMessage()
             );
 
         } catch (Throwable $exception) {
@@ -61,7 +79,9 @@ class PrescriptionController extends Controller
         Request $request,
         Prescription $prescription
     ): RedirectResponse {
-        $request->validate([
+        $this->authorize('reject', $prescription);
+
+        $validated = $request->validate([
             'rejection_reason' => [
                 'required',
                 'string',
@@ -70,16 +90,22 @@ class PrescriptionController extends Controller
         ]);
 
         try {
-            $prescription->update([
-                'status' => PrescriptionStatus::REJECTED->value,
-                'reviewed_by' => $request->user()->id,
-                'reviewed_at' => now(),
-                'rejection_reason' => $request->rejection_reason,
-            ]);
+            $this->prescriptionService->reject(
+                $prescription,
+                $request->user(),
+                $validated['rejection_reason']
+            );
 
             return back()->with(
                 'success',
                 'Prescription rejected successfully.'
+            );
+
+        } catch (DomainException $exception) {
+
+            return back()->with(
+                'error',
+                $exception->getMessage()
             );
 
         } catch (Throwable $exception) {

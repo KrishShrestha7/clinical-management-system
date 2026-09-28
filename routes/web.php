@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PatientController as AdminPatientController;
 use App\Http\Controllers\Admin\StaffController as AdminStaffController;
+use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
 use App\Http\Controllers\Receptionist\AppointmentController as ReceptionistAppointmentController;
 use App\Http\Controllers\Receptionist\DashboardController as ReceptionistDashboardController;
 use App\Http\Controllers\Receptionist\OrderController as ReceptionistOrderController;
@@ -54,89 +55,222 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
-
-    Route::get('/my-profile', [PatientProfileController::class, 'show'])
-        ->name('patient-profile.show');
-
-    Route::get('/my-profile/complete', [PatientProfileController::class, 'create'])
-        ->name('patient-profile.create');
-
-    Route::post('/my-profile/complete', [PatientProfileController::class, 'store'])
-        ->name('patient-profile.store');
-
-    Route::get('/my-profile/edit', [PatientProfileController::class, 'edit'])
-        ->name('patient-profile.edit');
-
-    Route::put('/my-profile', [PatientProfileController::class, 'update'])
-        ->name('patient-profile.update');
-
-    Route::get('/medicines', [MedicineCatalogController::class, 'index'])
-        ->name('medicines.catalog');
-
-    Route::get('/cart', [CartController::class, 'index'])
-        ->name('cart.index');
-
-    Route::post('/medicines/{medicine}/cart', [CartController::class, 'store'])
-        ->name('cart.store');
-
-    Route::delete('/cart/{medicine}', [CartController::class, 'remove'])
-        ->name('cart.remove');
-
-    Route::post('/checkout', [CartController::class, 'checkout'])
-        ->name('cart.checkout');
-
-    Route::get('/my-orders', [OrderController::class, 'index'])
-        ->name('orders.index');
-
-    Route::get('/my-orders/{order}', [OrderController::class, 'show'])
-        ->name('orders.show');
+    /*
+    |--------------------------------------------------------------------------
+    | General Authenticated Routes
+    |--------------------------------------------------------------------------
+    */
 
     Route::get(
-        '/my-orders/{order}/payment',
-        [PaymentController::class, 'create']
-    )->name('payments.create');
+        '/dashboard',
+        [DashboardController::class, 'index']
+    )->name('dashboard');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Shared Patient Management
+    |--------------------------------------------------------------------------
+    |
+    | Admin, doctor, and receptionist access is controlled by PatientPolicy.
+    |
+    */
+
+    Route::resource(
+        'patients',
+        PatientController::class
+    );
+
+    Route::get(
+        '/prescriptions/{prescription}/file',
+        [PrescriptionController::class, 'file']
+    )->name('prescriptions.file');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Patient-Only Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::middleware('patient')->group(function () {
+
+        /*
+        |----------------------------------------------------------------------
+        | Patient Profile
+        |----------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/my-profile',
+            [PatientProfileController::class, 'show']
+        )->name('patient-profile.show');
+
+        Route::get(
+            '/my-profile/complete',
+            [PatientProfileController::class, 'create']
+        )->name('patient-profile.create');
+
+        Route::post(
+            '/my-profile/complete',
+            [PatientProfileController::class, 'store']
+        )->name('patient-profile.store');
+
+        Route::get(
+            '/my-profile/edit',
+            [PatientProfileController::class, 'edit']
+        )->name('patient-profile.edit');
+
+        Route::put(
+            '/my-profile',
+            [PatientProfileController::class, 'update']
+        )->name('patient-profile.update');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Medicines
+        |----------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/medicines',
+            [MedicineCatalogController::class, 'index']
+        )->name('medicines.catalog');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Cart
+        |----------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/cart',
+            [CartController::class, 'index']
+        )->name('cart.index');
+
+        Route::post(
+            '/medicines/{medicine}/cart',
+            [CartController::class, 'store']
+        )->name('cart.store');
+
+        Route::delete(
+            '/cart/{medicine}',
+            [CartController::class, 'remove']
+        )->name('cart.remove');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Checkout
+        |----------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/checkout',
+            [CartController::class, 'checkout']
+        )->name('cart.checkout');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Orders
+        |----------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/my-orders',
+            [OrderController::class, 'index']
+        )->name('orders.index');
+
+        Route::get(
+            '/my-orders/{order}',
+            [OrderController::class, 'show']
+        )->name('orders.show');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Payments
+        |----------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/my-orders/{order}/payment',
+            [PaymentController::class, 'create']
+        )->name('payments.create');
+
+        Route::post(
+            '/my-orders/{order}/payment',
+            [PaymentController::class, 'store']
+        )->name('payments.store');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Receipt
+        |----------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/my-orders/{order}/receipt',
+            [OrderController::class, 'receipt']
+        )->name('orders.receipt');
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Prescriptions
+        |----------------------------------------------------------------------
+        */
+
+        Route::post(
+            '/medicines/{medicine}/prescription',
+            [PrescriptionController::class, 'store']
+        )->name('prescriptions.store');
+
+
+
+        /*
+        |----------------------------------------------------------------------
+        | Appointments
+        |----------------------------------------------------------------------
+        */
+
+        Route::get(
+            '/appointments',
+            [AppointmentController::class, 'index']
+        )->name('appointments.index');
+
+        Route::get(
+            '/appointments/create',
+            [AppointmentController::class, 'create']
+        )->name('appointments.create');
+
+        Route::post(
+            '/appointments',
+            [AppointmentController::class, 'store']
+        )->name('appointments.store');
+
+        Route::get(
+            '/appointments/{appointment}',
+            [AppointmentController::class, 'show']
+        )->name('appointments.show');
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logout
+    |--------------------------------------------------------------------------
+    */
 
     Route::post(
-        '/my-orders/{order}/payment',
-        [PaymentController::class, 'store']
-    )->name('payments.store');
-
-    Route::get(
-        '/my-orders/{order}/receipt',
-        [OrderController::class, 'receipt']
-    )->name('orders.receipt');
-
-    Route::post(
-        '/medicines/{medicine}/prescription',
-        [PrescriptionController::class, 'store']
-    )->name('prescriptions.store');
-
-    Route::resource('patients', PatientController::class);
-
-    Route::get(
-        '/appointments',
-        [AppointmentController::class, 'index']
-    )->name('appointments.index');
-
-    Route::get(
-        '/appointments/create',
-        [AppointmentController::class, 'create']
-    )->name('appointments.create');
-
-    Route::post(
-        '/appointments',
-        [AppointmentController::class, 'store']
-    )->name('appointments.store');
-
-    Route::get(
-        '/appointments/{appointment}',
-        [AppointmentController::class, 'show']
-    )->name('appointments.show');
-
-    Route::post('/logout', [AuthController::class, 'logout'])
-        ->name('logout');
+        '/logout',
+        [AuthController::class, 'logout']
+    )->name('logout');
 });
 
 
@@ -228,6 +362,36 @@ Route::middleware(['auth', 'admin'])
             [AdminStaffController::class, 'sendPasswordReset']
         )->name('staff.password-reset');
 
+        Route::get(
+            '/appointments',
+            [AdminAppointmentController::class, 'index']
+        )->name('appointments.index');
+
+        Route::get(
+            '/appointments/{appointment}',
+            [AdminAppointmentController::class, 'show']
+        )->name('appointments.show');
+
+        Route::patch(
+            '/appointments/{appointment}/confirm',
+            [AdminAppointmentController::class, 'confirm']
+        )->name('appointments.confirm');
+
+        Route::patch(
+            '/appointments/{appointment}/cancel',
+            [AdminAppointmentController::class, 'cancel']
+        )->name('appointments.cancel');
+
+        Route::patch(
+            '/appointments/{appointment}/reschedule',
+            [AdminAppointmentController::class, 'reschedule']
+        )->name('appointments.reschedule');
+
+        Route::patch(
+            '/appointments/{appointment}/complete',
+            [AdminAppointmentController::class, 'complete']
+        )->name('appointments.complete');
+
     });
 
 Route::middleware(['auth', 'receptionist'])
@@ -307,6 +471,16 @@ Route::middleware(['auth', 'doctor'])
         )->name('appointments.index');
 
         Route::get(
+            '/appointments/{appointment}/history',
+            [DoctorAppointmentController::class, 'history']
+        )->name('appointments.history');
+
+        Route::get(
+            '/appointments/{appointment}/patient',
+            [DoctorAppointmentController::class, 'patient']
+        )->name('appointments.patient');
+
+        Route::get(
             '/appointments/{appointment}',
             [DoctorAppointmentController::class, 'show']
         )->name('appointments.show');
@@ -315,14 +489,4 @@ Route::middleware(['auth', 'doctor'])
             '/appointments/{appointment}/complete',
             [DoctorAppointmentController::class, 'complete']
         )->name('appointments.complete');
-
-        Route::get(
-            '/appointments/{appointment}/patient',
-            [DoctorAppointmentController::class, 'patient']
-        )->name('appointments.patient');
-
-        Route::get(
-            '/appointments/{appointment}/history',
-            [DoctorAppointmentController::class, 'history']
-        )->name('appointments.history');
     });

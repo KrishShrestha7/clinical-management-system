@@ -48,7 +48,7 @@
 
             <div class="mb-3">
                 <strong>Order Status:</strong>
-                {{ ucfirst($order->status) }}
+                {{ ucfirst($order->status->value) }}
             </div>
 
             <div class="mb-4">

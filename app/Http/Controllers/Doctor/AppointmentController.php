@@ -25,7 +25,13 @@ class AppointmentController extends Controller
      */
     public function index(): View
     {
+        $this->authorize('viewAny', Appointment::class);
+
         $doctor = auth()->user()->staff;
+
+        if (!$doctor) {
+            abort(403);
+        }
 
         $appointments = $this->appointmentService
             ->getDoctorAppointments($doctor);
@@ -42,14 +48,7 @@ class AppointmentController extends Controller
     public function show(
         Appointment $appointment
     ): View {
-        $doctor = auth()->user()->staff;
-
-        if (
-            !$doctor ||
-            $appointment->doctor_id !== $doctor->id
-        ) {
-            abort(403);
-        }
+        $this->authorize('view', $appointment);
 
         $appointment->load([
             'patient',
@@ -64,21 +63,64 @@ class AppointmentController extends Controller
     }
 
     /**
+     * Display the patient associated with an appointment.
+     */
+    public function patient(
+        Appointment $appointment
+    ): View {
+        $this->authorize('view', $appointment);
+
+        $appointment->load('patient');
+
+        return view(
+            'doctor.patients.show',
+            [
+                'patient' => $appointment->patient,
+                'appointment' => $appointment,
+            ]
+        );
+    }
+
+    /**
+     * Display the patient's clinical history.
+     */
+    public function history(
+        Appointment $appointment
+    ): View {
+        $this->authorize('view', $appointment);
+
+        $doctor = auth()->user()->staff;
+
+        if (!$doctor) {
+            abort(403);
+        }
+
+        $history = $this->appointmentService->getPatientHistory(
+            $appointment->patient,
+            $doctor
+        );
+
+        return view(
+            'doctor.patients.history',
+            [
+                'patient' => $appointment->patient,
+                'appointment' => $appointment,
+                'appointments' => $history['appointments'],
+                'prescriptions' => $history['prescriptions'],
+                'orders' => $history['orders'],
+            ]
+        );
+    }
+
+    /**
      * Mark a confirmed appointment as completed.
      */
     public function complete(
         Appointment $appointment
     ): RedirectResponse {
+        $this->authorize('complete', $appointment);
+
         try {
-            $doctor = auth()->user()->staff;
-
-            if (
-                !$doctor ||
-                $appointment->doctor_id !== $doctor->id
-            ) {
-                abort(403);
-            }
-
             $this->appointmentService->complete(
                 $appointment
             );
@@ -104,57 +146,5 @@ class AppointmentController extends Controller
                 'Appointment could not be completed.'
             );
         }
-    }
-
-    public function patient(
-        Appointment $appointment
-    ): View {
-        $doctor = auth()->user()->staff;
-
-        if (
-            !$doctor ||
-            $appointment->doctor_id !== $doctor->id
-        ) {
-            abort(403);
-        }
-
-        $appointment->load('patient');
-
-        return view(
-            'doctor.patients.show',
-            [
-                'patient' => $appointment->patient,
-                'appointment' => $appointment,
-            ]
-        );
-    }
-
-    public function history(
-        Appointment $appointment
-    ): View {
-        $doctor = auth()->user()->staff;
-
-        if (
-            !$doctor ||
-            $appointment->doctor_id !== $doctor->id
-        ) {
-            abort(403);
-        }
-
-        $history = $this->appointmentService->getPatientHistory(
-            $appointment->patient,
-            $doctor
-        );
-
-        return view(
-            'doctor.patients.history',
-            [
-                'patient' => $appointment->patient,
-                'appointment' => $appointment,
-                'appointments' => $history['appointments'],
-                'prescriptions' => $history['prescriptions'],
-                'orders' => $history['orders'],
-            ]
-        );
     }
 }
