@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Enums\Gender;
 use Illuminate\Validation\Rule;
+use App\Rules\NepaliPhoneNumber;
 
 class UpdatePatientProfileRequest extends FormRequest
 {
@@ -25,8 +26,7 @@ class UpdatePatientProfileRequest extends FormRequest
         return [
             'phone' => [
                 'required',
-                'string',
-                'max:20',
+                new NepaliPhoneNumber,
             ],
 
             'date_of_birth' => [
@@ -59,8 +59,7 @@ class UpdatePatientProfileRequest extends FormRequest
 
             'emergency_contact_phone' => [
                 'required',
-                'string',
-                'max:20',
+                new NepaliPhoneNumber,
             ],
         ];
     }

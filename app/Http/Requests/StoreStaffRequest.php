@@ -6,6 +6,7 @@ use App\Enums\Gender;
 use App\Enums\UserRole;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Rules\NepaliPhoneNumber;
 
 class StoreStaffRequest extends FormRequest
 {
@@ -51,9 +52,8 @@ class StoreStaffRequest extends FormRequest
             ],
 
             'phone' => [
-                'nullable',
-                'string',
-                'max:20',
+                'required',
+                new NepaliPhoneNumber,
             ],
 
             'address' => [

@@ -28,24 +28,33 @@
     <div class="container">
 
         {{-- Dashboard / Home --}}
-        <a
-            href="{{
-                auth()->user()->isAdmin()
-                    ? route('admin.dashboard')
-                    : (
-                        auth()->user()->isReceptionist()
-                            ? route('receptionist.dashboard')
-                            : (
-                                auth()->user()->isDoctor()
-                                    ? route('doctor.dashboard')
-                                    : route('dashboard')
-                            )
-                    )
-            }}"
-            class="navbar-brand"
-        >
-            Clinical Management System
-        </a>
+        @auth
+            <a
+                href="{{
+                    auth()->user()->isAdmin()
+                        ? route('admin.dashboard')
+                        : (
+                            auth()->user()->isReceptionist()
+                                ? route('receptionist.dashboard')
+                                : (
+                                    auth()->user()->isDoctor()
+                                        ? route('doctor.dashboard')
+                                        : route('dashboard')
+                                )
+                        )
+                }}"
+                class="navbar-brand"
+            >
+                Clinical Management System
+            </a>
+        @else
+            <a
+                href="{{ route('login') }}"
+                class="navbar-brand"
+            >
+                Clinical Management System
+            </a>
+        @endauth
 
 
         @auth

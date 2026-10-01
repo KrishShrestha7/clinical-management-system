@@ -169,8 +169,28 @@ class OrderService
      */
     private function generateOrderNumber(): string
     {
-        return 'ORD-' . Str::upper(
-            (string) Str::ulid()
+        $lastOrder = Order::query()
+            ->where('order_number', 'like', 'ORD-%')
+            ->orderByDesc('id')
+            ->first();
+
+        $nextNumber = 1;
+
+        if ($lastOrder) {
+            $lastNumber = (int) str_replace(
+                'ORD-',
+                '',
+                $lastOrder->order_number
+            );
+
+            $nextNumber = $lastNumber + 1;
+        }
+
+        return 'ORD-' . str_pad(
+            $nextNumber,
+            2,
+            '0',
+            STR_PAD_LEFT
         );
     }
 }

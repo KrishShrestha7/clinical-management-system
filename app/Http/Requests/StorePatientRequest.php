@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Enums\Gender;
 use Illuminate\Validation\Rule;
 use App\Models\Patient;
+use App\Rules\NepaliPhoneNumber;
 
 class StorePatientRequest extends FormRequest
 {
@@ -38,8 +39,7 @@ class StorePatientRequest extends FormRequest
 
             'phone' => [
                 'required',
-                'string',
-                'max:20',
+                new NepaliPhoneNumber,
             ],
 
             'date_of_birth' => [
@@ -71,8 +71,7 @@ class StorePatientRequest extends FormRequest
 
             'emergency_contact_phone' => [
                 'required',
-                'string',
-                'max:20',
+                new NepaliPhoneNumber,
             ],
         ];
     }

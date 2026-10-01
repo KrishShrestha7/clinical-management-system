@@ -100,6 +100,28 @@ class StaffService
 
     private function generateEmployeeId(): string
     {
-        return 'EMP-' . Str::upper((string) Str::ulid());
+        $lastEmployee = Staff::query()
+            ->where('employee_id', 'like', 'EMP-%')
+            ->orderByDesc('id')
+            ->first();
+
+        $nextNumber = 1;
+
+        if ($lastEmployee) {
+            $lastNumber = (int) str_replace(
+                'EMP-',
+                '',
+                $lastEmployee->employee_id
+            );
+
+            $nextNumber = $lastNumber + 1;
+        }
+
+        return 'EMP-' . str_pad(
+            $nextNumber,
+            2,
+            '0',
+            STR_PAD_LEFT
+        );
     }
 }
